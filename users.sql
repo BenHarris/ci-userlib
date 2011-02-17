@@ -1,12 +1,12 @@
-CREATE TABLE IF NOT EXISTS users (
-  id          INT             NOT NULL UNIQUE AUTO_INCREMENT,
-  name        VARCHAR(64)     NOT NULL UNIQUE,
-  hash        CHAR(40)        NOT NULL,
-  hashnonce   CHAR(40)        NOT NULL,
-  cookienonce CHAR(40)        NOT NULL,
-  first       VARCHAR(64),
-  last        VARCHAR(64),
-  title       VARCHAR(64),
-  admin       BIT(1),
-  PRIMARY KEY (id)
-);
+CREATE TABLE `users` (
+`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+`name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+`hash` CHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+`hashnonce` CHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+`cookienonce` CHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+`first` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+`last` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+`title` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+`admin` BIT(1) NOT NULL,
+UNIQUE (`name`)
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci;
