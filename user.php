@@ -31,12 +31,12 @@ class User {
    * @return boolean
    */
   protected function fetch($unique) {
-    if(!(is_int($unique) || (is_string($unique) && !preg_match('/^[a-zA-Z0-9]{1,64}$/', $unique)))) {
+    if(!(is_int($unique) || (is_string($unique) && preg_match('/^[a-zA-Z0-9]{1,64}$/', $unique)))) {
       return false;
     }
     $from = is_int($unique) ? 'id' : 'name';
     $dbq = "SELECT * FROM users WHERE {$from} = '{$unique}' LIMIT 1;";
-    $result = mysql_result($dbq);
+    $result = mysql_query($dbq);
     if(mysql_num_rows($result) != 1) {
       return false;
     }
@@ -55,7 +55,7 @@ class User {
       return false;
     }
     $cookie = $_COOKIE[$this->realm];
-    if(!preg_match('/^([0-9]+)\:([a-f0-9]{40})$/', $cookie, $matches)) {
+    if(!preg_match('/^([0-9]+)' . preg_quote('-') . '([a-f0-9]{40})$/', $cookie, $matches)) {
       return false;
     }
     $id = $matches[1];
@@ -63,8 +63,8 @@ class User {
     if(!$this->fetch((int) $id)) {
       return false;
     }
-    $sha1 = sha1($this->user->id . ':' . $this->user->hash . ':' . $this->user->cookienonce);
-    return $cookie == $sha1 ? $result->id : false;
+    $sha1 = sha1($this->user->name . ':' . $this->user->hash . ':' . $this->user->cookienonce);
+    return $cookie == $sha1 ? $this->user->id : false;
   }
 
   /**
@@ -89,7 +89,7 @@ class User {
     // State which hashing algorithm to use, after determining which algorithms
     // we want exist on this installation of PHP.
     $algos = hash_algos();
-    switch($true) {
+    switch(true) {
       case in_array('whirlpool', $algos):
         $algo = 'whirlpool';
         break;
@@ -133,7 +133,13 @@ class User {
         $timeout = time() + 1209600;
       }
       $value = (string) $value;
-      setcookie($this->realm, $value, $timeout, '/', '.' . $_SERVER['SERVER_NAME']);
+      // Top tip! If you are using a local domain (like "localhost" or
+      // "devserver"), the host must be an empty string rather than the domain.
+      // Tooks me HOURS to figure that out :@
+      $host = strpos($_SERVER['SERVER_NAME'], '.') !== false
+            ? '.' . $_SERVER['SERVER_NAME']
+            : '';
+      setcookie($this->realm, $value, $timeout, '/', $host);
       return true;
     }
     return false;
@@ -161,7 +167,7 @@ class User {
     }
     // If the user supplied the correct password, set a cookie so that we can
     // validate the user accross different HTTP requests.
-    $cookie = $this->user->id . ':' . sha1($this->user->name . ':' . $this->user->hash . ':' . $this->user->cookienonce);
+    $cookie = $this->user->id . '-' . sha1($this->user->name . ':' . $this->user->hash . ':' . $this->user->cookienonce);
     $this->cookie($cookie);
     // Set the user ID for the rest of the script, and return true.
     $this->id = $this->user->id;
