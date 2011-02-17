@@ -5,7 +5,7 @@ Usage
 -----
 
 You are required to include the user library file, and create a new instance of
-the class *before* any output has been sent.
+the class **before** any output has been sent.
 If output is sent before the initialization of the class, cookies will not be
 able to be sent to the client.
 
@@ -53,7 +53,7 @@ Login is even simpler:
     $user->logout();
     // Maybe you'd like to redirect to the homepage, or login page at this point?
 
-*Please note:* All user details regarding login is filtered for you, you don't
+**Please note:** All user details regarding login is filtered for you, you don't
 have to worry about a thing. You do, however, have to filter the first name,
 last name and job title yourself, as I'm not sure what specification you have
 for those - I have by default limited them to 64 characters each. The username
