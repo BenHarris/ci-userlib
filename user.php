@@ -30,7 +30,7 @@ class User {
    * @param string|integer $unique
    * @return boolean
    */
-  potected function fetch($unique) {
+  protected function fetch($unique) {
     if(!(is_int($unique) || (is_string($unique) && !preg_match('/^[a-zA-Z0-9]{1,64}$/', $unique)))) {
       return false;
     }
@@ -151,7 +151,7 @@ class User {
    */
   public function login($username, $password) {
     // Check the function argument values, make sure they are usable.
-    if(!is_string($username) || !is_string($password) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', ($username = strtolower($username))) || !$this->fetch($username)) {
+    if(!is_string($username) || !is_string($password) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', ($username = strtolower($username))) || !$this->fetch($username) || $this->logged_in()) {
       return false;
     }
     // Generate the password hash and check against the value returned from the database.
