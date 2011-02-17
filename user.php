@@ -151,7 +151,7 @@ class User {
    */
   public function login($username, $password) {
     // Check the function argument values, make sure they are usable.
-    if(!is_string($username) || !is_string($password) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', $username) || !$this->fetch($username)) {
+    if(!is_string($username) || !is_string($password) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', ($username = strtolower($username))) || !$this->fetch($username)) {
       return false;
     }
     // Generate the password hash and check against the value returned from the database.
@@ -182,18 +182,32 @@ class User {
    * Create User
    *
    * @access public
-   * @param ...
-            ...
+   * @param string $username
+   * @param string $password
+   * @param string $first
+   * @param string $last
+   * @param string $title
+   * @param boolean $admin
    * @return boolean
    */
-  public function create($username, $password, $first, $last, $title, $admin = false) {
+  public function create($username, $password, $first = '', $last = '', $title = '', $admin = false) {
     if(!is_string($username) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', $username) || !is_string($password)) {
       return false;
     }
+    $username = strtolower($username);
     $cookienonce = sha1(microtime());
     $hashnonce = sha1(microtime());
-    $hash = $this->hash($password, $hashnonce);
+    $password = $this->hash($password, $hashnonce);
     $admin = $admin ? 1 : 0;
+    // Urgh! We're having to use a depreciated function! But we can't use the
+    // alternative as we don't have access to the connection handler in this
+    // class.
+    $first = is_string($first) ? mysql_escape_string(substr($first, 0, 64)) : '';
+    $first = is_string($last) ? mysql_escape_string(substr($last, 0, 64)) : '';
+    $first = is_string($title) ? mysql_escape_string(substr($title, 0, 64)) : '';
+    $dbq = "INSERT INTO users (name, hash, hashnonce, cookienonce, first, last, title, admin) VALUES ({$username}, {$password}, {$hashnonce}, {$cookienonce}, {$first}, {$last}, {$title}, b'{$admin}');";
+    $result = mysql_result($dbq);
+    return (boolean) $result;
   }
 
   /**
