@@ -1,7 +1,7 @@
 Matt's Homework Project
 =======================
 
-Usage
+Using the User Class
 -----
 
 You are required to include the user library file, and create a new instance of
@@ -23,7 +23,10 @@ You will then be able to use any of the following public methods:
  - `title()`: Return the job title of the current user.
  - `admin()`: Specifiy whether the current user is an administrator.
 
-The following is reference for example usage on a regular page.
+Example Usage
+-------------
+
+The following is an example usage on a regular page.
 
     if($user->logged_in()) {
       echo 'Welcome back, ' . $user->fullname() . '!';
@@ -52,6 +55,9 @@ Login is even simpler:
 
     $user->logout();
     // Maybe you'd like to redirect to the homepage, or login page at this point?
+
+Additional Notes
+----------------
 
 **Please note:** All user details regarding login is filtered for you, you don't
 have to worry about a thing. You do, however, have to filter the first name,
