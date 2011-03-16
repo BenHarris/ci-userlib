@@ -13,7 +13,7 @@
     exit('No direct script access allowed.');
   }
 
-  class User {
+  class Userlib {
 
     protected $realm = 'Your Application Name',
               $user = null,
@@ -212,6 +212,7 @@
      * @return boolean
      */
     public function logout() {
+      $this->id = false;
       return $this->cookie();
     }
 
@@ -286,6 +287,16 @@
      */
     public function admin() {
       return $this->logged_in() ? (boolean) $this->user->admin : false;
+    }
+
+    /**
+     * What is the User's login name?
+     *
+     * @access public
+     * @return string
+     */
+    public function username() {
+      return $this->logged_in() ? $this->user->name : false;
     }
 
   }
