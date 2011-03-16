@@ -81,7 +81,7 @@
      * @access protected
      * @return integer|false
      */
-    protected function validate() {
+    private function validate() {
       if(!isset($_COOKIE[$this->realm])) {
         return false;
       }

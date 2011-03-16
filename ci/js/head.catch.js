@@ -1,0 +1,18 @@
+﻿/**
+ * Head JS
+ * @author    Tero Piirainen  <http://cloudpanic.com/about.html>
+ * @copyright Tero Piirainen  <http://headjs.com>
+ * @license   MIT/X11         <http://j.mp/mit-license>
+ * @version   0.8
+ */
+(function(a){function z(){d||(d=!0,s(e,function(a){p(a)}))}function y(c,d){var e=a.createElement("script");e.type="text/"+(c.type||"javascript"),e.src=c.src||c,e.async=!1,e.onreadystatechange=e.onload=function(){var a=e.readyState;!d.done&&(!a||/loaded|complete/.test(a))&&(d(),d.done=!0)},b.appendChild(e)}function x(a,b){if(a.state==o&&b)return b();if(a.state==n)return k.ready(a.name,b);if(a.state==m)return a.onpreload.push(function(){x(a,b)});a.state=n,y(a.url,function(){a.state=o,b&&b(),s(g[a.name],function(a){p(a)}),d&&u()&&s(g.ALL,function(a){p(a)})})}function w(a,b){a.state||(a.state=m,a.onpreload=[],y({src:a.url,type:"cache"},function(){v(a)}))}function v(a){a.state=l,s(a.onpreload,function(a){a.call()})}function u(a){a=a||h;var b=!1,c=0;for(var d in a){if(a[d].state!=o)return!1;b=!0,c++}return b||c===0}function t(a){return Object.prototype.toString.call(a)=="[object Function]"}function s(a,b){if(!!a){typeof a=="object"&&(a=[].slice.call(a));for(var c=0;c<a.length;c++)b.call(a,a[c],c)}}function r(a){var b;if(typeof a=="object")for(var c in a)a[c]&&(b={name:c,url:a[c]});else b={name:q(a),url:a};var d=h[b.name];if(d&&d.url===b.url)return d;h[b.name]=b;return b}function q(a){var b=a.split("/"),c=b[b.length-1],d=c.indexOf("?");return d!=-1?c.substring(0,d):c}function p(a){a._done||(a(),a._done=1)}var b=a.documentElement,c,d,e=[],f=[],g={},h={},i=a.createElement("script").async===!0||"MozAppearance"in a.documentElement.style||window.opera,j=window.head_conf&&head_conf.head||"head",k=window[j]=window[j]||function(){k.ready.apply(null,arguments)},l=0,m=1,n=2,o=3;i?k.js=function(){var a=arguments,b=a[a.length-1],c=[];t(b)||(b=null),s(a,function(d,e){d!=b&&(d=r(d),c.push(d),x(d,b&&e==a.length-2?function(){u(c)&&p(b)}:null))});return k}:k.js=function(){var a=arguments,b=[].slice.call(a,1),d=b[0];if(!c){f.push(function(){k.js.apply(null,a)});return k}d?(s(b,function(a){t(a)||w(r(a))}),x(r(a[0]),t(d)?d:function(){k.js.apply(null,b)})):x(r(a[0]));return k},k.ready=function(a,b){if(a=="dom"){d?p(b):e.push(b);return k}t(a)&&(b=a,a="ALL");var c=h[a];if(c&&c.state==o||a=="ALL"&&u()&&d){p(b);return k}var f=g[a];f?f.push(b):f=g[a]=[b];return k},k.ready("dom",function(){c&&u()&&s(g.ALL,function(a){p(a)}),k.feature&&k.feature("domloaded",!0)}),setTimeout(function(){c=!0,s(f,function(a){a()})},0);if(window.addEventListener)a.addEventListener("DOMContentLoaded",z,!1),window.addEventListener("onload",z,!1);else if(window.attachEvent){a.attachEvent("onreadystatechange",function(){a.readyState==="complete"&&z()});var A=1;try{A=window.frameElement}catch(B){}!A&&b.doScroll&&function(){try{b.doScroll("left"),z()}catch(a){setTimeout(arguments.callee,1);return}}(),window.attachEvent("onload",z)}!a.readyState&&a.addEventListener&&(a.readyState="loading",a.addEventListener("DOMContentLoaded",handler=function(){a.removeEventListener("DOMContentLoaded",handler,!1),a.readyState="complete"},!1))})(document);
+/**
+ * HeadCatchJS
+ *
+ * @author    Alexander Baldwin, Nerv Interactive <http://nerv.co.uk/>.
+ * @copyright 2011 nerv Interactive <http://nerv.co.uk>
+ * @license   MIT/X11 <http://bit.ly/mit-license>
+ * @link      http://github.com/mynameiszanders/headcatch
+ * @version   1.0 (first public release)
+ */
+(function(a){if(typeof a=="function"&&window.s&&s instanceof Array){var b=document.createElement("a"),c="/test";b.href=c,b.href==c?window.ie&&ie instanceof Array&&s.push.apply(s,ie):window.x&&x instanceof Array&&s.push.apply(s,x);var d=s.slice(0);typeof f=="function"&&d.push(f),a.apply(null,d)}})(head.js)
