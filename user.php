@@ -63,7 +63,7 @@
         return false;
       }
       $from = is_int($unique) ? 'id' : 'name';
-      $dbq = "SELECT * FROM users WHERE {$from} = '{$unique}' LIMIT 1;";
+      $dbq = "SELECT * FROM users WHERE `{$from}` = '{$unique}' LIMIT 1;";
       $result = mysql_query($dbq);
       if(mysql_num_rows($result) != 1) {
         return false;
