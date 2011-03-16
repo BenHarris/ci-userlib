@@ -1,6 +1,8 @@
 Matt's Homework Project
 =======================
 
+Is now a CodeIgniter application. See that for examples.
+
 Using the User Class
 -----
 
@@ -28,7 +30,7 @@ Example Usage
 
 The following is an example usage on a regular page.
 
-    if($user->logged_in()) {
+    if($this->user->logged_in()) {
       echo 'Welcome back, ' . $user->fullname() . '!';
       if($user->admin()) {
         echo ' Visit the <a href="http://example.com/admin/">Admin Area</a>';
@@ -41,7 +43,7 @@ The following is an example usage on a regular page.
 Login is simple:
 
     if($login_form_has_been_submitted) {
-      if($user->login($_POST['username'], $_POST['password'])) {
+      if($this->user->login($_POST['username'], $_POST['password'])) {
         // Hurrah! The user has been logged in! Carry on the rest of the page
         // like normal.
       }
