@@ -17,7 +17,8 @@
 
     protected $realm = 'Your Application Name',
               $user = null,
-              $id = null;
+              $id = null,
+              $CI;
 
     /**
      * Constructor Method
@@ -26,6 +27,8 @@
      * @return void
      */
     public function __construct() {
+      $this->CI =& get_instance();
+      $this->CI->load->database();
       // Remove any non-alphanumeric characters from the realm.
       $this->realm = preg_replace('/[^a-zA-Z0-9]/', '', $this->realm);
       if(isset($_COOKIE[$this->realm])) {
@@ -64,11 +67,11 @@
       }
       $from = is_int($unique) ? 'id' : 'name';
       $dbq = "SELECT * FROM users WHERE `{$from}` = '{$unique}' LIMIT 1;";
-      $result = mysql_query($dbq);
-      if(mysql_num_rows($result) != 1) {
+      $result = $this->CI->db->query($dbq);
+      if($result->num_rows() != 1) {
         return false;
       }
-      $this->user = mysql_fetch_object($result);
+      $this->user = $result->row();
       return true;
     }
 
@@ -86,13 +89,13 @@
       if(!preg_match('/^([0-9]+)' . preg_quote('-') . '([a-f0-9]{40})$/', $cookie, $matches)) {
         return false;
       }
-      $id = $matches[1];
+      $id = (int) $matches[1];
       $cookie = $matches[2];
-      if(!$this->fetch((int) $id)) {
+      if(!$this->fetch($id)) {
         return false;
       }
       $sha1 = sha1($this->user->name . ':' . $this->user->hash . ':' . $this->user->cookienonce);
-      return $cookie == $sha1 ? $this->user->id : false;
+      return $cookie == $sha1 ? (int) $this->user->id : false;
     }
 
     /**
@@ -166,7 +169,7 @@
         // Tooks me HOURS to figure that out :@
         $host = strpos($_SERVER['SERVER_NAME'], '.') !== false
               ? '.' . $_SERVER['SERVER_NAME']
-              : '';
+              : false;
         setcookie($this->realm, $value, $timeout, '/', $host);
         return true;
       }
@@ -237,10 +240,10 @@
       // alternative as we don't have access to the connection handler in this
       // class.
       $first = is_string($first) ? mysql_escape_string(substr($first, 0, 64)) : '';
-      $first = is_string($last) ? mysql_escape_string(substr($last, 0, 64)) : '';
-      $first = is_string($title) ? mysql_escape_string(substr($title, 0, 64)) : '';
-      $dbq = "INSERT INTO users (name, hash, hashnonce, cookienonce, first, last, title, admin) VALUES ({$username}, {$password}, {$hashnonce}, {$cookienonce}, {$first}, {$last}, {$title}, b'{$admin}');";
-      $result = mysql_result($dbq);
+      $last = is_string($last) ? mysql_escape_string(substr($last, 0, 64)) : '';
+      $title = is_string($title) ? mysql_escape_string(substr($title, 0, 64)) : '';
+      $dbq = "INSERT INTO `users` (`name`, `hash`, `hashnonce`, `cookienonce`, `first`, `last`, `title`, `admin`) VALUES ('{$username}', '{$password}', '{$hashnonce}', '{$cookienonce}', '{$first}', '{$last}', '{$title}', b'{$admin}');";
+      $result = $this->CI->db->query($dbq);
       return (boolean) $result;
     }
 
@@ -252,7 +255,7 @@
      * @return boolean
      */
     public function logged_in() {
-      return is_int($this->id);
+      return (boolean) $this->id;
     }
 
     /**
