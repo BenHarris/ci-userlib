@@ -6,14 +6,11 @@ Is now a CodeIgniter application. See that for examples.
 Using the User Class
 -----
 
-You are required to include the user library file, and create a new instance of
-the class **before** any output has been sent.
+You are required to load the library **before** any output is sent to the browser.
 If output is sent before the initialization of the class, cookies will not be
 able to be sent to the client.
 
-    <?php
-      require_once '/path/to/user.php';
-      $user = new User;
+    $this->load->library('userlib');
 
 You will then be able to use any of the following public methods:
 
@@ -30,9 +27,9 @@ Example Usage
 
 The following is an example usage on a regular page.
 
-    if($this->user->logged_in()) {
+    if($this->userlib->logged_in()) {
       echo 'Welcome back, ' . $user->fullname() . '!';
-      if($user->admin()) {
+      if($this->userlib->admin()) {
         echo ' Visit the <a href="http://example.com/admin/">Admin Area</a>';
       }
     }
@@ -43,7 +40,7 @@ The following is an example usage on a regular page.
 Login is simple:
 
     if($login_form_has_been_submitted) {
-      if($this->user->login($_POST['username'], $_POST['password'])) {
+      if($this->userlib->login($_POST['username'], $_POST['password'])) {
         // Hurrah! The user has been logged in! Carry on the rest of the page
         // like normal.
       }
@@ -55,7 +52,7 @@ Login is simple:
 
 Login is even simpler:
 
-    $user->logout();
+    $this->userlib->logout();
     // Maybe you'd like to redirect to the homepage, or login page at this point?
 
 Additional Notes
