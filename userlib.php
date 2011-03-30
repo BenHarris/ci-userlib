@@ -243,7 +243,14 @@
       $first = is_string($first) ? mysql_escape_string(substr($first, 0, 64)) : '';
       $last = is_string($last) ? mysql_escape_string(substr($last, 0, 64)) : '';
       $title = is_string($title) ? mysql_escape_string(substr($title, 0, 64)) : '';
-      $dbq = "INSERT INTO `users` (`name`, `hash`, `hashnonce`, `cookienonce`, `first`, `last`, `title`, `admin`) VALUES ('{$username}', '{$password}', '{$hashnonce}', '{$cookienonce}', '{$first}', '{$last}', '{$title}', b'{$admin}');";
+      $dbq = "INSERT INTO `users` (
+                `name`, `hash`, `hashnonce`, `cookienonce`, `first`, `last`,
+                `title`, `admin`
+              )
+              VALUES (
+                '{$username}', '{$password}', '{$hashnonce}', '{$cookienonce}',
+                '{$first}', '{$last}', '{$title}', b'{$admin}'
+              );";
       $result = $this->CI->db->query($dbq);
       return (boolean) $result;
     }
