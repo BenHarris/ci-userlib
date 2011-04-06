@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
@@ -57,23 +56,12 @@
         identifying users.
       </p>
       <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; 'document',<br />
-        &#160;&#160;&#160;&#160;'header',<br />
-        &#160;&#160;&#160;&#160;'content',<br >
-        &#160;&#160;&#160;&#160;'featured' =&#62; 'featured_' . strtolower(date('D')),<br />
-        &#160;&#160;&#160;&#160;'footer',<br >
-        ));<br >
-        <br />
-        $this-&#62;template-&#62;autolink(false);<br />
-        $this-&#62;template-&#62;link(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; array('header', 'content', 'footer'),<br />
-        &#160;&#160;&#160;&#160;'content' =&#62; array('featured'),<br />
-        ));<br />
-        <br />
-        $this-&#62;template-&#62;section('shell')-&#62;add('title', 'Template Library');<br />
-        <br />
-        $this-&#62;template-&#62;load('shell');
+        if($this->userlib->logged_in()) {<br />
+          echo 'I\'m a logged in user!';<br />
+        }<br />
+        // Wait... Is that it?<br />
+        // Yeppp! Once you have loaded the library (autoloading is your<br />
+        // friend!), you can start using it straight away!<br />
       </code>
 
 
@@ -197,8 +185,8 @@
           <tr>
             <td>username</td>
             <td>
-              This is the username used to login with. It must be a string containing
-              between 1 and 64 alphanumeric characters only.
+              This is the username used to login with. This column must be able to store
+              a string containing between 1 and 64 alphanumeric characters only.
             </td>
           </tr>
           <tr>
@@ -226,1230 +214,234 @@
           </tr>
         </tbody>
       </table>
-      <code class="brush: xml;">
-        &#60;!DOCTYPE html&#62;<br />
-        &#60;html&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;head&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;title&#62;&#60;?php echo $title; ?&#62;&#60;/title&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;/head&#62;<br />
-        <br />
-        &#160;&#160;&#160;&#160;&#60;body&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!--{header}--&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;div class="content"&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!--{content}--&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;/div&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!--&#160;{footer}&#160;--&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;/body&#62;<br />
-        &#60;/html&#62;
-      </code>
-      <p>
-        As you can see, the syntax for referencing a section inside another is the
-        section name enclosed in braces, wrapped in a HTML comment tag. Whitespace is
-        allowed between the HTML comment tags and the braces, but not between the
-        braces and the section name.
-      </p>
-      <p>
-        Unfortunately, this isn't everything.<br />
-        To make this work you need to create the sections you are referencing first
-        via the <dfn>create()</dfn> or <dfn>acreate()</dfn> methods.<br />
-        <em>Secondly</em> (you cannot link together sections that do not yet exist),
-        you must then link those sections together using either the <dfn>link()</dfn>
-        method or enabling autolinking.
-      </p>
-      <code class="brush: php;">
-        <span>// Create the sections we are going to use.</span><br />
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; 'document',<br />
-        &#160;&#160;&#160;&#160;'header',<br />
-        &#160;&#160;&#160;&#160;'content',<br />
-        &#160;&#160;&#160;&#160;'footer',<br />
-        ));<br />
-        <br />
-        <span>// In most cases, just let the Template library link the sections together for you.</span><br />
-        <span>// Autolinking is enabled by default. The following is just a reference.</span><br />
-        $this-&#62;template-&#62;autolink(true);<br />
-        <br />
-        <span>// Sometimes you would want to manually specify the links between sections.</span><br />
-        $this-&#62;template-&#62;autolink(false);<br />
-        $links = array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; array('header', 'content', 'footer'),<br />
-        );<br />
-        $this-&#62;template-&#62;link($links);
-      </code>
-      <p class="important">
-        <strong>Note:</strong>
-        Auto creation of sections will be a feature in a later version of this library, but is not
-        a high priority.
-      </p>
 
 
 
-      <h1 id="groups">Groups</h1>
+      <h1 id="settings">Settings</h1>
       <p>
-        Groups are a collection of sections; of which can be iterated over in the view.<br />
-        The simplest way to create a group is by specifying a collection of sections via the
-        <dfn>group()</dfn> method.
+        Settings can be provided in a config file (usually located at "<dfn>application/config/</dfn>")
+        or through the <dfn>$this->userlib->settings()</dfn> method. Using the method overrides
+        the settings provided in the config file.
       </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'view1',<br />
-        &#160;&#160;&#160;&#160;'view2',<br />
-        &#160;&#160;&#160;&#160;'view3',<br />
-        ));<br />
-        <br />
-        <span>// Specify what you would like to call the group, and the sections it will contain.</span><br />
-        $this-&#62;template-&#62;group('group_name', array('view1', 'view2', 'view3'));
-      </code>
+      <h2>Required Settings</h2>
+      <h3>table</h3>
       <p>
-        Once you have created a group, you can keep adding sections to it via the
-        <dfn>join()</dfn> method.
+        The name of the table that will be used to store the necessary information.
+        This table must be in the database specified in your database configuration file.
       </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'view1',<br />
-        &#160;&#160;&#160;&#160;'view2',<br />
-        &#160;&#160;&#160;&#160;'view3',<br />
-        ));<br />
-        $this-&#62;template-&#62;group('group_name', array('view1'));<br />
-        <br />
-        <span>// Specify the name of the group you wish to add to, and a list of sections to be added.</span><br />
-        $this-&#62;template-&#62;join('group_name', array('view2', 'view3'));
-      </code>
-
-      <h3>Syntax</h3>
+      <h3>id</h3>
       <p>
-        The syntax in your views for groups is slightly different to referencing
-        sections; bearing a slight resemblence to PHP's arrays.
+        The name of the column that stores the user ID. Must be of type INT.
       </p>
-      <code class="brush: xml;">
-        &#60;!-- File: "views/content.php" --&#62;<br />
-        &#60;h3&#62;Featured&#60;/h3&#62;<br />
-        &#60;!--{group_name[]}--&#62;
-      </code>
-
-      <h3>Anonymous Groups</h3>
+      <h3>username</h3>
       <p>
-        Anonymous groups are useful for using views to iterate over sets of data,
-        without having to create each individual section. Essentially, passing an
-        array of data sets is a shortcut for creating a section, populating it with
-        a set of data, and adding it to a group multiple times.
+        The name of the column that stores the login username. Must be of character
+        type with a minimum length of 64.
       </p>
-      <code class="brush: php;">
-        <span>// Grab some data to create lots of views from.</span><br />
-        $db = new mysqli(DBHOST, DBUSER, DBPASS, DBNAME);<br />
-        $query = "SELECT `id`, `and`, `various`, `pieces`, `of, `data`<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;FROM `your_db`.`your_tbl`<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;WHERE `condition` = 'value'<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;LIMIT 5;";<br />
-        $results = $db-&#62;query($query);<br />
-        <br />
-        <span>// Create a group, consisting of multiple versions of a specified view from the data passed.</span><br />
-        $this-&#62;template-&#62;agroup('group_name', 'view_name', $results->fetch_all());<br />
-        <br />
-        <span>// For comparison, this is the same as the following.</span><br />
-        $this-&#62;template-&#62;group('group_name');<br />
-        while($row = $results-&#62;fetch_assoc()) {<br />
-        &#160;&#160;&#160;&#160;$this-&#62;template-&#62;create('section_' . $row['id'], 'view_name');<br />
-        &#160;&#160;&#160;&#160;$this-&#62;template-&#62;section()->add($row);<br />
-        &#160;&#160;&#160;&#160;$this-&#62;template-&#62;join('group_name', $this-&#62;template-&#62;section());<br />
-        }
-      </code>
+      <h3>password</h3>
       <p>
-        If you don't want all the sections in the group to have the same view, you can use the <dfn>ajoin()</dfn> method.
+        The name of the column that stores the user's hashes password. Must be of
+        character type with a mimimum length of 40.
       </p>
-      <code class="brush: php;">
-        <span>// Grab your two sets of data.</span><br />
-        $db = new mysqli(DBHOST, DBUSER, DBPASS, DBNAME);<br />
-        $males = $db-&#62;query("SELECT * FROM your_tbl WHERE `gender` = 'male' LIMIT 5;");<br />
-        $females = $db-&#62;query("SELECT * FROM your_tbl WHERE `gender` = 'female' LIMIT 5;");<br />
-        <br />
-        <span>// Create your anonymous group, and then add more anonymous sections which are associated with a different view.</span><br />
-        $this-&#62;template-&#62;agroup('group_name', 'profile_males', $males-&#62;fetch_all());<br />
-        $this-&#62;template-&#62;ajoin('group_name', 'profile_females', $females-&#62;fetch_all());
-      </code>
-
-      <h3>Mixing Sections and Groups</h3>
+      <h2>Optional Settings</h2>
+      <h3>realm</h3>
       <p>
-        The syntax for referencing sections and groups in views can be mixed. Each has
-        an equivalent which you can use.
-      </p>
-      <code class="brush: xml;">
-        <span>Specifying a section tag rather than a group tag means that you are referencing a singular object, which gets translated:</span><br />
-        <span>From </span>&#60;!--{ref}--&#62;<span> to </span>&#60;!--{ref[1]}--&#62;<span>.</span><br />
-        <br />
-        <span>Specifying a group count of zero in your view translates to unlimited.</span><br />
-        <span>This means that not specifying a group count means the reference tag gets translated:</span><br />
-        <span>From </span>&#60;!--{ref[]}--&#62;<span> to </span>&#60;!--{ref[0]}--&#62;<span>.</span>
-      </code>
-
-
-
-      <h1 id="features">Other Features</h1>
-
-      <h3>Data Propagation</h3>
-      <p>
-        Data gets added to a section, and that data gets passed to the associated view
-        when it gets rendered.<br />
-        By default, that render of the view is the only view that has access to that
-        particular set of data. However, if you wish for sections to inherit their
-        parents data (and grandparents, and great-grandparents, etc.), then you can
-        enable the <strong>data propagation</strong> functionality.
-      </p>
-      <p>
-        Consider the following view, which shall be refered to as the view
-        "views/content.php", and the <em>document</em> view (defined at the top of
-        this page).
-      </p>
-      <code class="brush: php;">
-        &#60;h2&#62;Page Content&#60;/h2&#62;<br />
-        &#60;p&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;?php<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;echo isset($para)<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;? $para<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;: 'N/A';<br />
-        &#160;&#160;&#160;&#160;?&#62;<br />
-        &#60;/p&#62;
-      </code>
-      <p>If we executed the following in our controller:</p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; 'document',<br />
-        &#160;&#160;&#160;&#160;'content',<br />
-        ));<br />
-        $this-&#62;template-&#62;autolink(true);<br />
-        <br />
-        // Add some example data.<br />
-        $this-&#62;template-&#62;section('shell')-&#62;add(array(<br />
-        &#160;&#160;&#160;&#160;'title' =&#62; 'Document Title',<br />
-        &#160;&#160;&#160;&#160;'para' =&#62; 'This is my example paragraph, inherited from the parent section.',<br />
-        ));<br />
-        <br />
-        // Don't allow the data from parent sections to propagate. This is the default<br />
-        // setting, so the following first statement is just a reference.<br />
-        $this-&#62;template-&#62;propagate(false);<br />
-        $this-&#62;template-&#62;load('shell');<br />
-        <br />
-        echo "\n\n";<br />
-        <br />
-        // This time allow the data from parent sections to propagate down.<br />
-        $this-&#62;template-&#62;propagate(true);<br />
-        $this-&#62;template-&#62;load('shell');
-      </code>
-      <p>We should get the following HTML output:</p>
-      <code class="brush: xml;">
-        &#60;!DOCTYPE html&#62;<br />
-        &#60;html&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;head&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;title&#62;Document Title&#60;/title&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;/head&#62;<br />
-        <br />
-        &#160;&#160;&#160;&#160;&#60;body&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!--{header}--&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;div class="content"&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;h2&#62;Page Content&#60;/h2&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;p&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;N/A<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;/p&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;/div&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!-- {footer} --&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;/body&#62;<br />
-        &#60;/html&#62;<br />
-        <br />
-        <br />
-        &#60;!DOCTYPE html&#62;<br />
-        &#60;html&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;head&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;title&#62;Document Title&#60;/title&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;/head&#62;<br />
-        <br />
-        &#160;&#160;&#160;&#160;&#60;body&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!--{header}--&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;div class="content"&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;h2&#62;Page Content&#60;/h2&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;p&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;This is my example paragraph, inherited from the parent section.<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;/p&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;/div&#62;<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;!-- {footer} --&#62;<br />
-        &#160;&#160;&#160;&#160;&#60;/body&#62;<br />
-        &#60;/html&#62;
-      </code>
-      <p class="important">
-        <strong>Note:</strong>
-        Notice that the header and footer reference tags are still there? That is
-        because we didn't create the header and footer sections.
-      </p>
-
-      <h3>Autolinking</h3>
-      <p>
-        You may set the library to automatically link sections together for you on
-        loading a section, thus removing the need to call the <dfn>load()</dfn> method
-        to manually specify which sections to link. This is the most usual case and
-        is enabled by default.
-      </p>
-      <p>
-        You may wish to disable this, and perform manual linking, in cases where you
-        have various psuedo reference tags in your views but do not want them to be
-        linked for that particular page.
-      </p>
-
-      <h3>Themes</h3>
-      <p>
-        This is more of how you could use the template library, rather than a specific
-        feature.<br />
-        By utilising the <dfn>set_dir()</dfn> and <dfn>set_prefix()</dfn> methods, you
-        could split your templates into separate <em>themes</em> (sub-directories
-        within the views folder) and/or have multiple template <em>versions</em> for
-        different conditionals.
-      </p>
-      <p>
-        Example of such conditionals could be a mobile version of your site ("mobile_"
-        prefix), various regions ("emea_" prefix), or dare I suggest it... Browsers
-        ("<a href="http://www.bringdownie6.com/" title="Bring down IE6!">ie6_</a>"
-        prefix, anyone?).
+        This can be any string, as all non-alphanumeric characters are removed. If
+        no alphanumeric characters are present, or this isn't set, this defaults to
+        "CodeIgniterUserLib".
       </p>
       <p class="important">
-        <strong>Note:</strong>
-        Relying on the User Agent header for browser detection on the server is not
-        fool proof and I do not recommend it. Please give your end user the option for
-        which version to view; too many times have I been stuck viewing the wrong
-        version of a site for the wrong platform. It's ANNOYING.
+        <strong>Hint:</strong>
+        Change this value to invalidate all cookies set for all users, forcing them
+        to re-authenticate.
       </p>
+      <h3>hashnonce</h3>
       <p>
-        These are interchangable. <dfn>set_dir()</dfn> and <dfn>set_prefix()</dfn> use
-        different approaches to achieve the same end-result - organising your
-        templates.
+        The name of the column that stores the user's hash nonce. Must be of character
+        type with a mimimum length of 40.<br />
+        If this is not set, it defaults to an empty string and is not used. The password
+        is still hashed, but will not be as secure.
       </p>
-
-      <h3>Valid Labels</h3>
+      <h3>cookienonce</h3>
       <p>
-        Many objects and pieces of data within this library have identifiers that are
-        strings. Therefore, as an added precaution, string identifiers in the library
-        have been restricted to adhering to the same format as a valid label in PHP
-        (function, class and variable names, etc.)<br />
-        This includes section and group names, and the variable names within the data
-        passed to sections (which goes without saying, you will be accessing them inside
-        the view with direct PHP variables).
+        The name of the column that stores the user's cookie nonce. Must be of character
+        type with a mimimum length of 40.<br />
+        If this is not set, it defaults to an empty string and is not used. The cookie
+        will still work, but the hashing will not be individual to each user, and cannot
+        be re-generated automatically.
       </p>
+      <h3>admin</h3>
       <p>
-        For those interested, the <abbr title="Perl Compatible Regular Expression">PCRE</abbr>
-        for a valid label is as follows.
+        The name of the column that stores whether the user is an admin or not. Can be
+        of any data type that can be evaluated to a boolean value.<br />
+        This is only useful if you have a very simple admin system in place, it does
+        not account for permissions, roles, etc.
       </p>
-      <code class="brush: plain;">/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/</code>
+      <h2>Example Configuration</h2>
+      <code class="brush: php;">
+        $config = array(<br />
+          'table'       =&#62; 'users_table',<br />
+          'id'          =&#62; 'id',<br />
+          'username'    =&#62; 'name',<br />
+          'password'    =&#62; 'userhash',<br />
+          'realm'       =&#62; 'SuperDuperCool',<br />
+          'hashnonce'   =&#62; 'nonce',<br />
+          'cookienonce' =&#62; 'cookie',<br />
+          'admin'       =&#62; 'superuser',<br />
+        );
+      </code>
 
 
 
       <h1 id="reference">Method Reference</h1>
 
 
-      <h2>$this->template->set_dir(<var>'dir_name'</var>)</h2>
+      <h2>$this-&#62;userlib-&#62;settings(<samp>$user_config</samp>)</h2>
       <dl>
         <dt>Parameters</dt>
         <dd>
           <dl>
-            <dt>$dir_name</dt>
-            <dd>string</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        This method accepts a directory name as its only input.
-        This is to set a sub-directory of the views directory to be used as the
-        directory to fetch views from, useful if you wish to split your views into
-        different themes.
-        Example:
-      </p>
-      <code class="brush: php;">
-        <span>// The section will have the view "views/document.php".</span><br />
-        $this->template->create('document');<br />
-        <br />
-        <span>// The following section will have the view "views/myTheme/document.php".</span><br />
-        $this->template->set_dir('myTheme');<br />
-        $this->template->create('document');<br />
-        <br />
-        <span>// You can set a directory any number of levels deep, too.</span><br />
-        $this->template->set_dir('nested/directories/work/fine');
-      </code>
-      <p>
-        The first, and only, parameter contains the name of the directory, relative to
-        the views folder. If the directory you specify does not exist, the sub-directory
-        will not be set and the method will return <kbd>false</kbd>.<br />
-        Returns <kbd>true</kbd> on success.
-      </p>
-
-
-      <h2>$this->template->set_prefix(<var>'prefix'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$prefix</dt>
-            <dd>string</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        Like set_dir(), except you specify a string to be prepended onto the view filename.
-      </p>
-      <code class="brush: php;">
-        <span>// The section will have the view "views/prefix_document.php".</span><br />
-        $this->template->set_prefix('prefix_');<br />
-        $this->template->create('document');
-      </code>
-      <p>
-        The first, and only, parameter must be a string containing alphanumeric
-        characters only, and cannot start with a digit. If the string you pass adheres
-        to this check, the prefix will be set and the method return <kbd>true</kbd>, if not,
-        <kbd>false</kbd>.
-      </p>
-
-
-      <h2>$this->template->view_exists(<var>'view_name'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$view_name</dt>
-            <dd>string</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        Does what it say's on the tin, really. Pass it a view name, and it will return
-        a boolean value depending on whether the view exists or not. This function will
-        also depend on whether you have used <dfn>set_prefix()</dfn> or <dfn>set_dir()</dfn>
-        previously.
-      </p>
-      <code class="brush: php;">
-        <span>// Imagine, if you will, you have the following in your views folder:</span><br />
-        <span>// document.php</span><br />
-        <span>// myTheme / prefix_header.php</span><br />
-        <br />
-        $this->template->view_exists('document');                  // bool(true)<br />
-        $this->template->view_exists('myTheme/prefix_header.php'); // bool(true)<br />
-        <br />
-        $this->template->set_dir('myTheme');<br />
-        $this->template->view_exists('header');                    // bool(false)<br />
-        <br />
-        $this->template->set_prefix('prefix_');<br />
-        $this->template->view_exists('header')                     // bool(true);
-      </code>
-
-
-      <h2>$this->template->section_exists(<var>'section_name'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$section_name</dt>
-            <dd>string</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        To check whether a section exists, funnily enough. Pass it a string containing
-        what you named your section, and it will return a boolean value depending on
-        whether it exists or not.
-      </p>
-      <code class="brush: php;">
-        $this->template->create('document');<br />
-        <br />
-        <span>// Did we create that section? I can't remember now.</span><br />
-        if($this->template->section_exists('document')) {<br />
-        &#160;&#160;&#160;&#160;$this->template->section('document')->add('data', 'some_data');<br />
-        }
-      </code>
-
-
-      <h2>$this-template->create(<samp>$sections</samp> || <var>'section_name'</var>, [<var>'view_name'</var>])</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$sections</dt>
-            <dd>object | array(int|string =&#62; string, ...)</dd>
-          </dl>
-        </dd>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$section_name</dt>
-            <dd>string</dd>
-            <dt>$view_name</dt>
-            <dd>string</dd>
+            <dt>$user_config</dt>
+            <dd>array(string =&#62; string, ...)</dd>
           </dl>
         </dd>
         <dt>Returns</dt>
         <dd>void</dd>
       </dl>
       <p>
-        This is where the magic starts! This is a flexible function to create sections
-        from views.
+        Override any settings that have been set in the configuration file. The
+        array can contain as many or as little configuation options as you want.
       </p>
       <code class="brush: php;">
-        <span>// Don't forget that sub-directory and prefix apply here.</span><br />
-        <br />
-        <span>// Create a section called "document" from the view "views/document.php".</span><br />
-        $this-&#62;template-&#62;create('document');<br />
-        <br />
-        <span>// Create a section called "document" from the view "views/myDocument.php".</span><br />
-        $this-&#62;template-&#62;create('document', 'myDocument');<br />
-        <br />
-        <span>// Create multiple sections in one call.</span><br />
-        $sections = array(<br />
-        &#160;&#160;&#160;&#160;'document' =&#62; 'myDocument',<br />
-        &#160;&#160;&#160;&#160;'header',<br />
-        &#160;&#160;&#160;&#160;'footer',<br />
-        );<br />
-        $this-&#62;template-&#62;create($sections);
-      </code>
-      <p>
-        When you create a section, it automatically becomes the <strong>active section</strong>.
-        If you passed an array, the last element in the array will become the active section.
-      </p>
-
-
-      <h2>$this->template->acreate(<samp>$sections</samp> | <var>'section_name'</var>, <var>'content'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$sections</dt>
-            <dd>object | array(int|string =&#62; string, ...)</dd>
-            <dt>$content</dt>
-            <dd>string</dd>
-          </dl>
-        </dd>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$section_name</dt>
-            <dd>string</dd>
-            <dt>$content</dt>
-            <dd>string</dd>
-          </dl>
-        </dd>
-      </dl>
-      <dl>
-        <dt>Returns</dt>
-        <dd>void</dd>
-      </dl>
-      <p>
-        Create an <strong>anonymous section</strong>. An anonymous section is where
-        you pass the content directly into the section, rather than loading it from a
-        view.
-      </p>
-      <p class="important">
-        <strong>Note:</strong>
-        Although you can still add data to the section, and retrieve it with the
-        <dfn>data()</dfn> method, the output/content of an anonymous section will always be the
-        string you passed, unaltered.
-      </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;acreate('content', '&#60;p&#62;This is my documents content!&#60;/p&#62;');<br />
-        <br />
-        $sections = array(<br />
-        &#160;&#160;&#160;&#160;'content' =&#62; '&#60;p&#62;This is my content.&#60;/p&#62;',<br />
-        &#160;&#160;&#160;&#160;'footer' =&#62; '&amp;copy; 2010.'<br />
-        );<br />
-        $this->template->acreate($sections);
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;group(<var>'group_name'</var>, <samp>$sections</samp>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$group_name</dt>
-            <dd>string</dd>
-            <dt>$sections</dt>
-            <dd>array(string, ...)</dd>
-          </dl>
-        </dd>
-        <dt>Return</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        As explained in <a href="#groups">Groups</a>, this method groups multiple
-        sections that will be iterated over in a single section reference tag.
-      </p>
-      <p>
-        The first parameter takes a string as the group name, which must be in the same
-        format as a valid PHP label. It cannot be the name of an already existing section
-        or group.<br />
-        The second parameter is an array containing zero or more section names - or
-        objects - that you wish to include in the group. If any of these sections are
-        not valid, they are ignored.
-      </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'view1',<br />
-        &#160;&#160;&#160;&#160;'view2',<br />
-        &#160;&#160;&#160;&#160;'view3',<br />
-        ));<br />
-        <br />
-        <span>// Specify what you would like to call the group, and the sections it will contain.</span><br />
-        $this-&#62;template-&#62;group('group_name', array('view1', 'view2', 'view3'));
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;agroup(<var>'group_name'</var>, <var>'view_name'</var>, [<samp>$data</samp>])</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$group_name</dt>
-            <dd>string</dd>
-            <dt>$view_name</dt>
-            <dd>string</dd>
-            <dt>$data</dt>
-            <dd>int | array(array(string =&#62; mixed, ...), ...)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        This will create an anonymous group from a set, or sets, of data. Instead of
-        creating a group by specifying known sections, you pass a view and set(s) of
-        section data. This method will then interate through the data (which may consist
-        of an empty array if you do not wish the section to have any data), creating
-        sections on-the-fly and adding them to the new group.
-      </p>
-      <p>
-        The first parameter is the obvious group name to be created. The second, the
-        view to apply to all the anonymous sections.<br />
-        Lastly, the third parater can either be an array of arrays, or a positive integer.
-        If an array is passed, it must contain an array of data for each section to be
-        created in the group - if an integer is passed, it simulates an array containing
-        that many empty arrays (eg, create this many sections with no data).
-      </p>
-      <p>If the group name already exists as a group or section name, or the set of data is not an array or positive integer, the method will return false.</p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;agroup(<br />
-        &#160;&#160;&#160;&#160;'group_anon',<br />
-        &#160;&#160;&#160;&#160;'view1',<br />
-        &#160;&#160;&#160;&#160;array(<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;array('Section Title One', 'more data', $some_var, true),<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;array('Section Title Two', 'more data', $some_var, false),<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;array('Section Title Three', 'more data', $some_var, true),<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;array('Section Title Four', 'more data', $some_var, false),<br />
-        &#160;&#160;&#160;&#160;)<br />
-        );<br />
-        <br />
-        $this-&#62;template-&#62;agroup('group_anon', 'view1', 5);
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;join(<var>'group_name'</var>, <samp>$sections</samp>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$group_name</dt>
-            <dd>string</dd>
-            <dt>$sections</dt>
-            <dd>array(string, ...)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        This method simply adds sections to a group that already exists with sections
-        associated with it prior to this method being called. Provide the name of
-        the group, and an array of the sections you wish to add to it, and... Wait,
-        that's all there is to it!
-      </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'view1',<br />
-        &#160;&#160;&#160;&#160;'view2',<br />
-        &#160;&#160;&#160;&#160;'view3',<br />
-        ));<br />
-        $this-&#62;template-&#62;group('group_name', array('view1', 'view2'));<br />
-        <br />
-        $this-&#62;template-&#62;join('group_name', array('view3'));
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;ajoin(<var>'group_name'</var>, <var>'view_name'</var>, [<samp>$data</samp>])</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$group_name</dt>
-            <dd>string</dd>
-            <dt>$view_name</dt>
-            <dd>string</dd>
-            <dt>$data</dt>
-            <dd>int | array(array(string =&#62; mixed, ...), ...)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        This method provides exactly the same functionality as the <dfn>agroup()</dfn>
-        method, except that it is used on groups that already exist and have sections
-        associated with them prior to this method being called.
-      </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'view1',<br />
-        &#160;&#160;&#160;&#160;'view2',<br />
-        &#160;&#160;&#160;&#160;'view3',<br />
-        ));<br />
-        $this-&#62;template-&#62;group('group_name', array('view1', 'view2', 'view3'));<br />
-        <br />
-        $this-&#62;template-&#62;ajoin(<br />
-        &#160;&#160;&#160;&#160;'group_name',<br />
-        &#160;&#160;&#160;&#160;'view4',<br />
-        &#160;&#160;&#160;&#160;array(<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;array('title' => 'some title'),<br />
-        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;array('title' => 'another title'),<br />
-        &#160;&#160;&#160;&#160;)<br />
-        );<br />
-        $this-&#62;template-&#62;ajoin('group_name', 'view_requiring_no_data', 4);
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;active(<var>'section_name'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$section_name</dt>
-            <dd>string | &#60;Template_Section&#62; object</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        Passing this method a section name will set that section as the
-        "<em>active</em>" section. Setting a section as active will do two
-        things, to act as shortcuts.
-      </p>
-      <ul>
-        <li>
-          Calling the <dfn>section()</dfn> method with no parameter assumes you
-          mean the active section.
-        </li>
-        <li>
-          Calling the <dfn>load()</dfn> method with no parameter assumes you
-          mean the active section.
-        </li>
-      </ul>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; 'document',<br />
-        &#160;&#160;&#160;&#160;'header',<br />
-        &#160;&#160;&#160;&#160;'footer',<br />
-        ));<br />
-        $this-&#62;template-&#62;active('shell');<br />
-        $shell = $this-&#62;template-&#62;section();
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;section([<var>'section_name'</var>])</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$section_name</dt>
-            <dd>string | &#60;Template_Section&#62; object | boolean(true)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>object | false</dd>
-      </dl>
-      <p>
-        Returns a section as an instance of the Template library's section class.
-        If the section does not exist, it returns <kbd>false</kbd>.<br />
-        The section object will have access to all the methods described in
-        "<a href="#sectionmethods" title="Jump to the Section Method Reference">Section Method Reference</a>".
-      </p>
-      <code class="brush: php;">
-        <span>// Create the section, which will also be set as the active section.</span><br />
-        $this-&#62;template-&#62;create('shell', 'document');<br />
-        $section = $this-&#62;template-&#62;section();<br />
-        <br />
-        $section-&#62;add('some_variable', 'some_data');<br />
-        <br />
-        <span>// Because the section() method returns an object, you can chain it up like a gangsta.</span><br />
-        $this-&#62;template-&#62;section()-&#62;add('some_variable', 'some_data');
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;link(<samp>$links</samp>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$links</dt>
-            <dd>array(string =&#62; array(string, ...), ...)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>void</dd>
-      </dl>
-      <p class="important">
-        <strong>Note:</strong>
-        There is no need to use this method if the Autolinking feature is enabled.
-      </p>
-      <p>
-        This method manually creates a link for a section to be included inside another section.
-        When linking manually, a section's content will only replace the corresponding section
-        reference tag in the view if it has been linked using this method first. This allows
-        you to mix and match which tags in a view are operational for this template load.
-      </p>
-      <code class="brush: php;">
-        $this-&#62;template-&#62;create(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; 'document',<br />
-        &#160;&#160;&#160;&#160;'header',<br />
-        &#160;&#160;&#160;&#160;'footer',<br />
-        &#160;&#160;&#160;&#160;'content',<br />
-        ));<br />
-        <span>// Create a group called "features" containing 3 sections from the "featured_box" view.</span><br />
-        $this-&#62;template-&#62;agroup('features', 'featured_box', array(null, null, null));<br />
-        <br />
-        <span>// Create the full HTML output.</span><br />
-        $this-&#62;template-&#62;load('shell');<br />
-        <br />
-        <span>// However, if you wanted to just show the content of the page, and not the header</span><br />
-        <span>// or footer (for a print-friendly version of the page, for example).</span><br />
-        $this-&#62;template-&#62;autolink(false);<br />
-        <span>// Only link the sections you want to be included in the final output.</span>
-        $this-&#62;template-&#62;link(array(<br />
-        &#160;&#160;&#160;&#160;'shell' =&#62; array('content'),<br />
-        &#160;&#160;&#160;&#160;'content' =&#62; array('features'),<br />
-        ));<br />
-        $this-&#62;template-&#62;load('shell');
-      </code>
-      <p class="important">
-        <strong>Note:</strong>
-        If you have section reference tags which have not been linked, they will remain in the final output.
-      </p>
-
-
-      <h2>$this-&#62;template-&#62;propagate(<kbd>boolean</kbd>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$propagate</dt>
-            <dd>boolean</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>void</dd>
-      </dl>
-      <p>
-        This changes the setting for enabling or disabling the data propagation
-        functionality. Pass a boolean with the value of <kbd>true</kbd> to enable or
-        <kbd>false</kbd> to disable.
-      </p>
-      <p>Data propagation is disabled by default.</p>
-
-
-      <h2>$this-&#62;template-&#62;autolink(<kbd>boolean</kbd>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$autolink</dt>
-            <dd>boolean</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>void</dd>
-      </dl>
-      <p>
-      <p>
-        This method changes the setting for enabling or disabling the autolink
-        functionality. Yep, you've heard this before, but pass <kbd>true</kbd> to
-        enable and <kbd>false</kbd> to disable.
-      </p>
-      <p>Autolinking is enabled by default.</p>
-
-
-      <h2>$this-&#62;template-&#62;autoload(<var>'config'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$config</dt>
-            <dd>string | array(string =&#62; mixed, ...)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>boolean</dd>
-      </dl>
-      <p>
-        The autoload method enables us to save some time by setting up parts of the
-        template library from config. You may either pass the name of a config file
-        you wish to use, or pass the array directly to the method.<br />
-        The following is an example of all the options available.
-      </p>
-      <code class="brush: php;">
-        <span>// Load the options from a config file.</span><br />
-        $loaded = $this-&#62;template-&#62;autoload('template');<br />
-        <br />
-        <span>// Or you can pass the array directly to the method if that fails.</span><br />
-        if(!$loaded) {<br />
-        &#160;&#160;&#160;&#160;$config = get_config('template');<br />
-        &#160;&#160;&#160;&#160;$this-&#62;template-&#62;autoload($config);<br />
-        }
-      </code>
-      <p class="important">
-        <strong>Note:</strong>
-        If the method fails to load a config file specified, then loading it through
-        <dfn>get_config()</dfn> will fail, also, as this function is called within the
-        method.
-      </p>
-      <code class="brush: php;">
-        $config = array();<br />
-        <br />
-        $config['set_dir'] = 'subfolder';<br />
-        $config['set_prefix'] = 'mobilesite_';<br />
-        <br />
-        $config['create']   = array(<br />
-        &#160;&#160;&#160;&#160;'shell' => 'document',<br />
-        &#160;&#160;&#160;&#160;'header',<br />
-        &#160;&#160;&#160;&#160;'content',<br />
-        &#160;&#160;&#160;&#160;'footer',<br />
-        &#160;&#160;&#160;&#160;'featured_01' => 'featured_box',<br />
-        &#160;&#160;&#160;&#160;'featured_02' => 'featured_box',<br />
-        );<br />
-        <br />
-        $config['group'] = array(<br />
-        &#160;&#160;&#160;&#160;<span>// We can extend the "features" group in the controller with Template::join().</span><br />
-        &#160;&#160;&#160;&#160;'features' => array('featured_01', 'featured_02'),<br />
-        );<br />
-        <br />
-        $config['add']      = array(<br />
-        &#160;&#160;&#160;&#160;'shell' => array('title' => 'Your Site Name'),<br />
-        );<br />
-        <br />
-        $config['autolink'] = false;<br />
-        $config['link'] = array(<br />
-        &#160;&#160;&#160;&#160;'shell' => array('header', 'footer', 'content'),<br />
-        &#160;&#160;&#160;&#160;'content' => array('features'),<br />
+        $options = array(
+        &#160;&#160;&#160;&#160;'password' =&#62; 'user_hash',
+        &#160;&#160;&#160;&#160;'realm' =&#62; 'My Realm',
         );
+        $this-&#62;userlib-&#62;settings($options);
       </code>
-      <p>
-        Each option in the config refers to it's respective method in the Template
-        library. Note that the order in which you specify them in the array or config
-        does not affect the outcome.
-      </p>
-      <p class="important">
-        <strong>Note:</strong>
-        This method will return a boolean value depending on whether it could fetch
-        the config successfully (if it could load the config file or an array was
-        passed). It does not return a value depending on the success of the autoload,
-        if one ore more of the options fail, they will just be ignored.
-      </p>
-
-      <h3>set_dir</h3>
-      <p>
-        This takes exactly the same parameter as <dfn>set_dir()</dfn> - an individual
-        string.
-      </p>
-      <h3>set_prefix</h3>
-      <p>
-        This takes exactly the same parameter as <dfn>set_prefix()</dfn> - an
-        individual string.
-      </p>
-
-      <h3>create</h3>
-      <p>
-        This takes <dfn>create()</dfn>'s single array argument.
-      </p>
-
-      <h3>group</h3>
-      <p>
-        This takes an array of <dfn>group()</dfn> parameters, where the array key is
-        the group name, and the value is an array of sections.
-      </p>
-
-      <h3>add</h3>
-      <p>
-        Similar to the group option. This takes an array of the arrays you would pass
-        to <dfn>add()</dfn>, where the array key is the section name.
-      </p>
-
-      <h3>autolink</h3>
-      <p>
-        Takes a boolean value of whether you want to autolink or not.<br />
-        If you set this to <kbd>true</kbd>, then the link option will be ignored
-        regardless.
-      </p>
-
-      <h3>link</h3>
-      <p>
-        This takes a single parameter, which is identical to the one you would pass to
-        <dfn>link()</dfn> - an individual array.
-      </p>
 
 
-      <h2>$this-&#62;template-&#62;load(<var>'section'</var>, [<kbd>boolean</kbd>])</h2>
+      <h2>$this-&#62;userlib-&#62;login(<var>'username'</var>, <var>'password'</var>)</h2>
       <dl>
         <dt>Parameters</dt>
         <dd>
           <dl>
-            <dt>$section_name</dt>
-            <dd>string | &#60;Template_Section&#62; object</dd>
-            <dt>$return</dt>
+            <dt>$username</dt>
+            <dd>string</dd>
+            <dt>$password</dt>
+            <dd>string</dd>
+          </dl>
+        </dd>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
+      <code class="brush: php;">
+        if($this-&#62;userlib-&#62;login($_POST['username'], $_POST['password'])) {
+        &#160;&#160;&#160;&#160;echo 'You are logged in!';
+        }
+        else {
+        &#160;&#160;&#160;&#160;// Display the login form again.
+        }
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;logout()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
+      <h2>$this-&#62;userlib-&#62;create(<var>'username'</var>, <var>'password'</var>, [<kbd>boolean</kbd>])</h2>
+      <dl>
+        <dt>Parameters</dt>
+        <dd>
+          <dl>
+            <dt>$username</dt>
+            <dd>string</dd>
+            <dt>$password</dt>
+            <dd>string</dd>
+            <dt>$admin</dt>
             <dd>boolean</dd>
           </dl>
         </dd>
         <dt>Returns</dt>
-        <dd>boolean</dd>
+        <dd>array(string =&#62; string, ...)</dd>
       </dl>
-      <p>
-        This method is usually the last one you will call from the Template library.
-        It will load the section you specify, pulling all it's linked descendants, and
-        populating all sections with their data. Because this method will render
-        itself and all its <strong>descendants</strong>, it is a good idea to have one
-        of your sections hold a <strong>root</strong>, or <strong>shell</strong>, view
-        (ie. one that does not have parents or siblings).
-      </p>
-      <p>
-        While the first parameter is the section you wish to load (you may also pass a
-        section object if you wish), the second parameter controls what happens with
-        the rendered output; pass <kbd>true</kbd> will return the output as a string
-        instead of appending it to the output buffer of CodeIgniter's Output class.
-      </p>
-      <p class="important">
-        <strong>Note:</strong>
-        This method can only take a valid section as its argument; groups cannot be
-        rendered directly - they must be referenced from within a view.
-      </p>
       <code class="brush: php;">
-        $this-&#62;template-&#62;create('shell', 'document');<br />
-        <br />
-        <span>// Render all your sections and send to output buffer.</span><br />
-        $this->template->load('shell');<br />
-        <br />
-        <span>// If you'd prefer the rendered output to return rather than be sent to</span><br />
-        <span>// CodeIgniter's Output class, pass bool(true) as the second parameter.</span><br />
-        $output = $this-&#62;template-&#62;load('shell', true);<br />
-        <br />
-        <span>// You can also pass a section object to load.</span><br />
-        $section = $this-&#62;template-&#62;section('shell');<br />
-        $this-&#62;template-&#62;load($section);
+        // Just call the method, and the cookie will be unset.
+        $logged_out = $this-&#62;userlib-&#62;logout();
+        if(!$logged_out) {
+        &#160;&#160;&#160;&#160;echo 'There was a problem logging you out, please try again.';
+        }
       </code>
 
 
-
-      <h1 id="sectionmethods">Section Method Reference</h1>
-
-
-      <h2>$this-&#62;template-&#62;section()-&#62;name()</h2>
+      <h2>$this-&#62;userlib-&#62;logged_in()</h2>
       <dl>
-        <dt>Returns</dt>
-        <dd>string</dd>
-      </dl>
-      <p>
-        Returns the name of the section. Whilst this won't really be used much, as
-        most of the library uses string to identify sections, there may be times where
-        you have the section object, and wish to know the name.
-      </p>
-      <code class="brush: php;">
-        <span>// You've been given the $section variable from somewhere.</span><br />
-        $section = $this->template->section($unknown_value);<br />
-        <br />
-        <span>// And viola! We know what section it is now!</span><br />
-        $section_name = $section->name();
-      </code>
-      <p>This method takes no parameters.</p>
-
-
-      <h2>$this->template->section()->view()</h2>
-      <dl>
-        <dt>Returns</dt>
-        <dd>string | boolean(false)</dd>
-      </dl>
-      <p>
-        Returns the name of the view that the section is using. This will the view you
-        specified with the <dfn>create()</dfn> method, and will not contain the view
-        prefix.
-      </p>
-      <p class="important">
-        <strong>Note:</strong>
-        An anonymous section will return the boolean <kbd>false</kbd>.
-      </p>
-      <p>This method takes no parameters.</p>
-
-
-      <h2>$this-&#62;template-&#62;section()-&#62;data([<samp>$data</samp>])</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$data</dt>
-            <dd>array(string =&#62; mixed, ...)</dd>
-          </dl>
-        </dd>
-        <dt>Returns</dt>
-        <dd>array(string =&#62; mixed, ...)</dd>
-      </dl>
-      <p>
-        This method, with no parameters passed, will return all the data that has been
-        added to the section so far. If an array is passed as the first parameter, it
-        will act in the same way as the <dfn>add()</dfn> method, with the exception of
-        keeping the sections original value if a variable with the same name has
-        already been added. This method is used to pass a parent data to its child if
-        data propagation is enabled.
-      </p>
-      <code class="brush: php;">
-        <span>// Fetch the data that we have added to the section already.</span><br />
-        $data = $this->template->section()->data();<br />
-        <br />
-        <span>// Let the section inherit another sections data.</span><br />
-        $data = $this->template->section('another_section')->data();<br />
-        $this->template->section()->data($data);
-      </code>
-
-
-      <h2>$this-&#62;template-&#62;section()-&#62;content()</h2>
-      <dl>
-        <dt>Returns</dt>
-        <dd>string</dd>
-      </dl>
-      <p>
-        Return the content of the section. If this is an anonymous section, then it
-        will simply return the string you supplied it when you created it.<br />
-        If this section is associated with a view (and it most likely will be), the
-        view will be loaded with the data provided, just as a normal view does.
-      </p>
-      <p class="important">
-        <strong>Note:</strong>
-        When getting a sections content, this library does not load the view via
-        CodeIgniter's <a href="http://codeigniter.com/user_guide/libraries/loader.html" title="Loader Documentation Page"><dfn>Loader::view()</dfn></a>.<br />
-        Instead it uses its own implementation - a protected method called
-        <dfn>load_view()</dfn> - to prevent CodeIgniter caching the views data and
-        using it in other views. This would contradict the data propagation
-        functionality.
-      </p>
-      <p class="important">
-        <strong>Note:</strong>
-        When the content is returned, it will still contain the section references,
-        even if you have specifically linked them using the <dfn>link()</dfn> method.<br />
-        Sections are not combined until the <dfn>load()</dfn> method is invoked.
-      </p>
-      <code class="brush: php;">
-        <span>// For example.</span><br />
-        $html = $this->template->section()->content();
-      </code>
-      <p>
-        This method takes no <del>prisoners</del> <ins>parameters</ins>.
-      </p>
-
-
-      <h2>$this-&#62;template-&#62;section()-&#62;add(<samp>$data</samp> || <var>'name'</var>, <var>'value'</var>)</h2>
-      <dl>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$data</dt>
-            <dd>object | array(string =&#62; mixed, ...)</dd>
-          </dl>
-        </dd>
-        <dt>Parameters</dt>
-        <dd>
-          <dl>
-            <dt>$name</dt>
-            <dd>string</dd>
-            <dt>$value</dt>
-            <dd>mixed</dd>
-          </dl>
-        </dd>
         <dt>Returns</dt>
         <dd>boolean</dd>
       </dl>
       <p>
-        Adding data to a section is the same as passing data to a view. The data in
-        the section is stored in the object - accessible via the <dfn>data()</dfn>
-        section method - and passed to the view when the <dfn>content()</dfn> section
-        method is called. You may keep calling this method over and over again to
-        stock-pile your data, ready to be used within the sections designated view.
+        Returns a boolean value depending on whether a user is currently logged in or not.
       </p>
       <code class="brush: php;">
-        $this-&#62;template-&#62;section()-&#62;add('variable_name', 'variable_value');<br />
-        $this-&#62;template-&#62;section()-&#62;add('another_variable', 123);<br />
-        <br />
-        <span>// Passing an array as the only parameter allows you to pass multiple sets of</span><br />
-        <span>// data at once, just like when you load a view.</span><br />
-        $data = array(<br />
-        &#160;&#160;&#160;&#160;'var1' =&#62; 'value1',<br />
-        &#160;&#160;&#160;&#160;'var2' =&#62; 'value2',<br />
-        );<br />
-        $this-&#62;template-&#62;section()-&#62;add($data);
+        if($this-&#62;userlib-&#62;logged_in()) {
+        &#160;&#160;&#160;&#160;echo 'Welcome back, ' . $this-&#62;userlib-&#62;username() . '!';
+        }
+        else {
+        &#160;&#160;&#160;&#160;// Redirect to login form?
+        }
       </code>
 
 
-
-      <h1 id="magicmethods">Magic Methods</h1>
+      <h2>$this-&#62;userlib-&#62;admin()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
       <p>
-        A couple of PHP's magic methods are implemented in section objects as
-        shortcuts.
-      </p>
-      <h3>Treating a section object as a string</h3>
-      <p>
-        Treating a section object as a string is a shortcut for returning the output
-        of the <dfn>load()</dfn> method, had it been called on that section.
+        Returns a boolean value depending on whether the currently logged in user is
+        an administrator. If there is no user logged in, or the admin table column is
+        not defined, it will return false.
       </p>
       <code class="brush: php;">
-        $shell = $this-&#62;template-&#62;section('shell');<br />
-        <br />
-        <span>// The following two statements are equivalent:</span><br />
-        echo $this-&#62;template-&#62;load('shell', true);<br />
-        echo $shell;<br />
-        <br />
-        <span>// Notice that we echo'd out what was returned from the load() method. The</span><br />
-        <span>// following two statements are also equivalent:</span><br />
-        $this-&#62;template-&#62;load('shell');<br />
-        $this-&#62;output-&#62;append_output($shell);
+        if(!$this-&#62;userlib-&#62;admin()) {
+        &#160;&#160;&#160;&#160;exit('You are not an administrator and therefore not allowed to view this page, you naughty, naughty person!');
+        }
       </code>
-      <p class="important">
-        <strong>Note:</strong>
-        Remember that the string returned will not have been passed to CodeIgniter's
-        Output class, so if you are using the pseudo-variables
-        <var>{elapsed_time}</var> or <var>{memory_usage}</var>, these will not have
-        been parsed at this time.
-      </p>
 
-      <h3>Treating a section object as a function</h3>
+
+      <h2>$this-&#62;userlib-&#62;username()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>false|string</dd>
+      </dl>
       <p>
-        Treating a section object as a function is a shortcut to the sections
-        <dfn>add()</dfn> method. Please refer to that method for the parameters it
-        accepts.
+        Returns a string containing the username of the currently logged in user. If there
+        is no user logged in, it will return a boolean false.
       </p>
       <code class="brush: php;">
-        $shell = $this-&#62;template-&#62;section('shell');<br />
-        $shell('title', 'Your Document Title');
+        echo 'Welcome back, ' . $this-&#62;userlib-&#62;username() . '!';
       </code>
-      <p class="important">
-        <strong>Note:</strong>
-        This feature is only available to PHP versions 5.3+
+
+
+      <h2>$this-&#62;userlib-&#62;userid()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>false|string</dd>
+      </dl>
+      <p>
+        Returns the currently logged in user's ID as an integer. If there is no user logged
+        in, it will return a boolean false.
       </p>
+      <code class="brush: php;">
+        echo 'Welcome back, ' . anchor('profile/' . $this-&#62;userlib-&#62;userid(), $this-&#62;userlib-&#62;username()) . '!';
+      </code>
 
 
 
       <h1 id="accreditations">Accreditations</h1>
       <p>
-        Template library, by <a href="http://github.com/mynameiszanders" title="GitHub Profile">Alexander Baldwin</a>;
+        User Authentication library, by <a href="http://github.com/mynameiszanders" title="GitHub Profile">Alexander Baldwin</a>;
         written for the <a href="http://codeigniter.com" title="CodeIgniter Homepage">CodeIgniter</a> PHP Application
         Framework, by <a href="http://ellislab.com" title="EllisLab, Inc.">EllisLab</a>.
       </p>
