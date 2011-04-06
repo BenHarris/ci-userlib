@@ -20,7 +20,7 @@
                 'realm' => '',
                 'table' => 'users',
                 'id' => 'id',
-                'user' => 'username',
+                'username' => 'username',
                 'password' => 'hash',
                 'hashnonce' => false,
                 'cookienonce' => false,
@@ -36,13 +36,15 @@
      * @access public
      * @return void
      */
-    public function __construct() {
+    public function __construct($user_config = false) {
       $this->CI =& get_instance();
       $this->CI->load->database();
       // Load any config settings that the user has saved in a file, and
       // incorporate them into the library settings.
-      $this->CI->config->load('userlib', true, true);
-      $user_config = $this->CI->config->item('userlib');
+      if(!is_array($user_config) || !$user_config) {
+        $this->CI->config->load('userlib', true, true);
+        $user_config = $this->CI->config->item('userlib');
+      }
       if(is_array($user_config) && $user_config) {
         foreach($user_config as $key => $value) {
           if(array_key_exists($key, $this->settings)) {
@@ -56,9 +58,15 @@
                   && ($realm = preg_replace('/[^a-zA-Z0-9]/', '', $this->settings['realm'])) != ''
                    ? $realm
                    : 'CodeIgniterUserLib';
-      // Check that the table name and the username and password column names
+      // Check that the table name and the id, username and password column names
       // are valid. These are the minimum requirements.
-      foreach(array($this->settings['table'], $this->settings['id'], $this->settings['user'], $this->settings['password']) as $check) {
+      $checks = array(
+        $this->settings['table'],
+        $this->settings['id'],
+        $this->settings['username'],
+        $this->settings['password']
+      );
+      foreach($checks as $check) {
         if(!is_string($check) || strlen($check) > 64 || strlen($check) < 1) {
           $this->id = false;
           return false;
@@ -74,6 +82,22 @@
     }
 
     /**
+     * Settings
+     *
+     * Provide settings in the controller to override the settings automatically
+     * fetched from the userlib configuration file.
+     *
+     * @access public
+     * @param array $user_config
+     * @return void
+     */
+    public function settings($user_config) {
+      if(is_array($user_config) && $user_config) {
+        $this->__construct($user_config);
+      }
+    }
+
+    /**
      * Fetch User Details from Database
      *
      * @access protected
@@ -84,24 +108,35 @@
       if(!(is_int($unique) || (is_string($unique) && preg_match('/^[a-zA-Z0-9]{1,64}$/', $unique)))) {
         return false;
       }
-      $from = is_int($unique) ? $this->settings['id'] : $this->settings['user'];
-      $dbq = "SELECT * FROM users WHERE `{$from}` = '{$unique}' LIMIT 1;";
-      $dbq = "SELECT `{$this->settings['id']}` AS id, `{$this->settings['user']}` AS name, `{$this->settings['password']}` AS hash"
+      $from = is_int($unique) ? $this->settings['id'] : $this->settings['username'];
+      // Generate the SQL Query for grabbing the required data from the database.
+      $dbq = "SELECT `{$this->settings['id']}` AS `id`, `{$this->settings['username']}` AS `name`, `{$this->settings['password']}` AS `hash`";
       if(is_string($this->settings['hashnonce'])) {
-        $dbq .= ", `{$this->settings['hashnonce']}` AS hashnonce";
+        $dbq .= ", `{$this->settings['hashnonce']}` AS `hashnonce`";
       }
       if(is_string($this->settings['cookienonce'])) {
-        $dbq .= ", `{$this->settings['cookienonce']}` AS cookienonce";
+        $dbq .= ", `{$this->settings['cookienonce']}` AS `cookienonce`";
       }
       if(is_string($this->settings['admin'])) {
-        $dbq .= ", `{$this->settings['cookienonce']}` AS admin";
+        $dbq .= ", `{$this->settings['admin']}` AS `admin`";
       }
-      $dbq .= " FROM `{$this->settings['table']}` WHERE `{$from}` = '{$unique}' LIMIT 1;"
+      $dbq .= " FROM `{$this->settings['table']}` WHERE `{$from}` = '{$unique}' LIMIT 1;";
+      // Query the database and make sure we have a usable result.
       $result = $this->CI->db->query($dbq);
       if($result->num_rows() != 1) {
         return false;
       }
       $this->user = $result->row();
+      // If the optional column are not present, fill them with default data.
+      if(!isset($this->user->cookienonce)) {
+        $this->user->cookienonce = '';
+      }
+      if(!isset($this->user->hashnonce)) {
+        $this->user->hashnonce = '';
+      }
+      $this->user->admin = isset($this->user->admin) && $this->user->admin
+                         ? true
+                         : false;
       return true;
     }
 
@@ -249,40 +284,34 @@
     /**
      * Create User
      *
+     * Returns an array of key-value pairs ready to be inserted into the users
+     * table. The format is: column name => field value.
+     *
      * @access public
      * @param string $username
      * @param string $password
-     * @param string $first
-     * @param string $last
-     * @param string $title
      * @param boolean $admin
-     * @return boolean
+     * @return array
      */
-    public function create($username, $password, $first = '', $last = '', $title = '', $admin = false) {
+    public function create($username, $password, $admin = false) {
       if(!is_string($username) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', $username) || !is_string($password)) {
         return false;
       }
-      $username = strtolower($username);
-      $cookienonce = sha1(microtime());
-      $hashnonce = sha1(microtime());
-      $password = $this->hash($password, $hashnonce);
-      $admin = $admin ? 1 : 0;
-      // Urgh! We're having to use a depreciated function! But we can't use the
-      // alternative as we don't have access to the connection handler in this
-      // class.
-      $first = is_string($first) ? mysql_escape_string(substr($first, 0, 64)) : '';
-      $last = is_string($last) ? mysql_escape_string(substr($last, 0, 64)) : '';
-      $title = is_string($title) ? mysql_escape_string(substr($title, 0, 64)) : '';
-      $dbq = "INSERT INTO `users` (
-                `name`, `hash`, `hashnonce`, `cookienonce`, `first`, `last`,
-                `title`, `admin`
-              )
-              VALUES (
-                '{$username}', '{$password}', '{$hashnonce}', '{$cookienonce}',
-                '{$first}', '{$last}', '{$title}', b'{$admin}'
-              );";
-      $result = $this->CI->db->query($dbq);
-      return (boolean) $result;
+      $details = array();
+      $details[$this->settings['username']] = strtolower($username);
+      $cookienonce = is_string($this->settings['cookienonce']) ? sha1(microtime()) : '';
+      if($cookienonce) {
+        $details[$this->settings['cookienonce']] = $cookienonce;
+      }
+      $hashnonce = is_string($this->settings['hashnonce']) ? sha1(microtime()) : '';
+      if($hashnonce) {
+        $details[$this->settings['hashnonce']] = $hashnonce;
+      }
+      $details[$this->settings['password']] = $this->hash($password, $hashnonce);
+      if(is_string($this->settings['admin'])) {
+        $details[$this->settings['admin']] = (boolean) $admin;
+      }
+      return $details;
     }
 
     /**
