@@ -15,7 +15,17 @@
 
   class Userlib {
 
-    protected $realm = 'Your Application Name',
+    protected $realm,
+              $settings = array(
+                'realm' => '',
+                'table' => 'users',
+                'id' => 'id',
+                'user' => 'username',
+                'password' => 'hash',
+                'hashnonce' => false,
+                'cookienonce' => false,
+                'admin' => false,
+              ),
               $user = null,
               $id = null,
               $CI;
@@ -29,29 +39,38 @@
     public function __construct() {
       $this->CI =& get_instance();
       $this->CI->load->database();
-      // Remove any non-alphanumeric characters from the realm.
-      $this->realm = preg_replace('/[^a-zA-Z0-9]/', '', $this->realm);
+      // Load any config settings that the user has saved in a file, and
+      // incorporate them into the library settings.
+      $this->CI->config->load('userlib', true, true);
+      $user_config = $this->CI->config->item('userlib');
+      if(is_array($user_config) && $user_config) {
+        foreach($user_config as $key => $value) {
+          if(array_key_exists($key, $this->settings)) {
+            $this->settings[$key] = $value;
+          }
+        }
+      }
+      // Remove any non-alphanumeric characters from the realm. If that results
+      // in an empty string, set a default realm.
+      $this->realm = is_string($this->settings['realm'])
+                  && ($realm = preg_replace('/[^a-zA-Z0-9]/', '', $this->settings['realm'])) != ''
+                   ? $realm
+                   : 'CodeIgniterUserLib';
+      // Check that the table name and the username and password column names
+      // are valid. These are the minimum requirements.
+      foreach(array($this->settings['table'], $this->settings['id'], $this->settings['user'], $this->settings['password']) as $check) {
+        if(!is_string($check) || strlen($check) > 64 || strlen($check) < 1) {
+          $this->id = false;
+          return false;
+        }
+      }
+      // If the realm cookie exists, validate it!
       if(isset($_COOKIE[$this->realm])) {
         $this->id = $this->validate();
       }
       else {
         $this->id = false;
       }
-    }
-
-    public static function tableSQL() {
-      return "CREATE TABLE `users` (
-                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                `name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-                `hash` CHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-                `hashnonce` CHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-                `cookienonce` CHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-                `first` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
-                `last` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
-                `title` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
-                `admin` BIT(1) NOT NULL,
-                UNIQUE (`name`)
-              ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
     }
 
     /**
@@ -65,8 +84,19 @@
       if(!(is_int($unique) || (is_string($unique) && preg_match('/^[a-zA-Z0-9]{1,64}$/', $unique)))) {
         return false;
       }
-      $from = is_int($unique) ? 'id' : 'name';
+      $from = is_int($unique) ? $this->settings['id'] : $this->settings['user'];
       $dbq = "SELECT * FROM users WHERE `{$from}` = '{$unique}' LIMIT 1;";
+      $dbq = "SELECT `{$this->settings['id']}` AS id, `{$this->settings['user']}` AS name, `{$this->settings['password']}` AS hash"
+      if(is_string($this->settings['hashnonce'])) {
+        $dbq .= ", `{$this->settings['hashnonce']}` AS hashnonce";
+      }
+      if(is_string($this->settings['cookienonce'])) {
+        $dbq .= ", `{$this->settings['cookienonce']}` AS cookienonce";
+      }
+      if(is_string($this->settings['admin'])) {
+        $dbq .= ", `{$this->settings['cookienonce']}` AS admin";
+      }
+      $dbq .= " FROM `{$this->settings['table']}` WHERE `{$from}` = '{$unique}' LIMIT 1;"
       $result = $this->CI->db->query($dbq);
       if($result->num_rows() != 1) {
         return false;
