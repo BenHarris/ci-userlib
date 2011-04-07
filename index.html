@@ -56,8 +56,8 @@
         identifying users.
       </p>
       <code class="brush: php;">
-        if($this->userlib->logged_in()) {<br />
-          echo 'I\'m a logged in user!';<br />
+        if($this-&#62;userlib-&#62;logged_in()) {<br />
+        &#160;&#160;&#160;&#160;echo 'I\'m a logged in user!';<br />
         }<br />
         // Wait... Is that it?<br />
         // Yeppp! Once you have loaded the library (autoloading is your<br />
@@ -335,6 +335,13 @@
         <dt>Returns</dt>
         <dd>boolean</dd>
       </dl>
+      <p>
+        This method takes two strings, the user's username and password, and validates
+        them against the values stored in the database. If the user's credentials
+        are correct, it will return a boolean value depending on whether the correct
+        headers to set the cookie were successfully sent. If the user's credentials
+        were incorrect, it will return a boolean false.
+      </p>
       <code class="brush: php;">
         if($this-&#62;userlib-&#62;login($_POST['username'], $_POST['password'])) {
         &#160;&#160;&#160;&#160;echo 'You are logged in!';
@@ -350,6 +357,26 @@
         <dt>Returns</dt>
         <dd>boolean</dd>
       </dl>
+      <p>
+        Logs out the currently logged in user by unsetting the cookie. This method
+        returns a boolean value depending on whether the cookie was successfully
+        removed or not.
+      </p>
+      <p class="important">
+        <strong>Note:</strong>
+        This method technically does not return a value of whether the cookie was
+        removed or not, instead it returns its value depending on whether the correct
+        headers were successfully sent to the client.
+      </p>
+      <code class="brush: php;">
+        // Just call the method, and the cookie will be unset.
+        $logged_out = $this-&#62;userlib-&#62;logout();
+        if(!$logged_out) {
+        &#160;&#160;&#160;&#160;echo 'There was a problem logging you out, please try again.';
+        }
+      </code>
+
+
       <h2>$this-&#62;userlib-&#62;create(<var>'username'</var>, <var>'password'</var>, [<kbd>boolean</kbd>])</h2>
       <dl>
         <dt>Parameters</dt>
@@ -366,11 +393,21 @@
         <dt>Returns</dt>
         <dd>array(string =&#62; string, ...)</dd>
       </dl>
+      <p>
+        Creates the necessary details ready to be stored in the database from the
+        specified username and password given. An optional third parameter may be
+        passed to specify whether the new user is an administrator, but this defaults
+        to false.<br />
+        This method will return a boolean false if any of the parameters were incorrect.
+      </p>
       <code class="brush: php;">
-        // Just call the method, and the cookie will be unset.
-        $logged_out = $this-&#62;userlib-&#62;logout();
-        if(!$logged_out) {
-        &#160;&#160;&#160;&#160;echo 'There was a problem logging you out, please try again.';
+        $new_user = $this-&#62;userlib-&#62;create($_POST['username'], $_POST['password'], $admin);
+        if(is_array($new_user)) {
+        &#160;&#160;&#160;&#160;// Insert the new user's data into the database.
+        &#160;&#160;&#160;&#160;$this-&#62;db-&#62;insert('yourTable', $new_user);
+        }
+        else {
+        &#160;&#160;&#160;&#160;// Display login form again, incorrect parameters passed.
         }
       </code>
 
