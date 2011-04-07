@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>User Authentication Library: CodeIgniter User Guide</title>
+    <meta charset="utf-8" />
+    <!--
+      Although "Ellislab is making the markup and CSS from the CodeIgniter user
+      guide freely available to the community for their use", please refer to
+      the CodeIgniter license agreement at:
+      http://codeigniter.com/user_guide/license.html
+    -->
+    <meta name="author" content="Alexander Baldwin" />
+    <meta name="description" content="A CodeIgniter User Authentication library, hosted on GitHub, to take the hassle out of authenticating users. This library hashes passwords, realms and usernames using cryptographic nonces to minimise the risk of falsely identifying users." />
+    <meta name="keywords" content="users, library, class, codeigniter, framework, nonce, cryptographic, password, hash, username, authentication, auth, application, git, github" />
+    <!--
+      The semantic structure of this document has been laid out in a way that shouldn't
+      need a stylesheet. Therefore, the decision has been made to switch from regular
+      CSS to LeSS, to support one of my favourite open-source projects; LeSS.js
+      http://github.com/cloudhead/less.js
+    -->
+    <link href="./css/userguide.css" rel="stylesheet" media="all" title="User Guide Stylesheet" type="text/css" />
+  </head>
+
+  <body>
+
+    <a id="ribbon" href="http://github.com/mynameiszanders/ci-userlib/" title="Fork this library on GitHub">
+      <img src="./ribbon.png" alt="Fork me on GitHub" title="Fork me on GitHub" height="149" width="149" />
+    </a>
+
+    <table style="width:100%;padding:0;border:0;border-spacing:0;">
+      <tr>
+        <td id="breadcrumb">
+          <a href="http://codeigniter.com/" target="_blank">CodeIgniter Home</a> &#8250;
+          <a href="http://codeigniter.com/user_guide/index.html" target="_blank">User Guide Home</a> &#8250;
+          User Authentication Library
+        </td>
+      </tr>
+    </table>
+
+    <br class="all" />
+    <div id="content">
+
+
+
+      <h1>User Authentication Library</h1>
+      <p class="important">
+        <strong>Todo:</strong>
+        The following features are yet to be implemented, and are in the issues list as functionality to be added.<br />
+        Max time before re-login,<br />
+        Re-generating cookie nonces.
+      </p>
+      <p>
+        The CodeIgniter User Authentication library, hosted on GitHub, to take the
+        hassle out of authenticating users. This library hashes passwords, realms
+        and usernames using cryptographic nonces to minimise the risk of falsely
+        identifying users.
+      </p>
+      <code class="brush: php;">
+        if($this-&#62;userlib-&#62;logged_in()) {<br />
+        &#160;&#160;&#160;&#160;echo 'I\'m a logged in user!';<br />
+        }<br />
+        // Wait... Is that it?<br />
+        // Yeppp! Once you have loaded the library (autoloading is your<br />
+        // friend!), you can start using it straight away!<br />
+      </code>
+
+
+      <h2>Downloading</h2>
+      <p>
+        A copy of the User Authentication library can be found <a href="http://github.com/mynameiszanders/ci-userlib" title="CI User Authentication library on GitHub">on GitHub</a>
+        in <a href="https://github.com/mynameiszanders/ci-userlib/raw/master/Userlib.php" title="Userlib.php in raw text format">raw text format</a>,
+        or the entire project - including a copy of this user guide - can be downloaded
+        in <a href="http://github.com/mynameiszanders/ci-userlib/zipball/master" title="Download a copy of the CI User Authentication library in Zip format.">zip</a>
+        or <a href="http://github.com/mynameiszanders/ci-userlib/tarball/master" title="Download a copy of the CI User Authentication library in Tarball format.">tarball</a>
+        formats.
+      </p>
+      <p>
+        This project can be cloned from the GitHub repository via the command
+      </p>
+      <code class="brush: bash;">
+        $ git clone git://github.com/mynameiszanders/ci-userlib.git
+      </code>
+      <p>
+        However, if you would like to be loved even more, then <a href="http://github.com/mynameiszanders/ci-userlib#fork-box" title="Fork the repository mynameiszanders/ci-userlib@master">fork the repository</a>,
+        make some improvements, and send a
+        <a href="https://github.com/mynameiszanders/ci-userlib/pull/new/master" title="Send a pull request on mynameiszanders/ci-userlib@master">pull request</a>!<br />
+        If you need help with either of these processes, please refer to the GitHub
+        help guide on <a href="http://help.github.com/forking/" title="Help.GitHub - Forking a project">forking</a> and
+        <a href="http://help.github.com/pull-requests/" title="Help.GitHub - Sending pull requests">pull requests</a>.
+      </p>
+
+
+      <h2>Releases</h2>
+      <ul>
+        <li>
+          <a href="https://github.com/mynameiszanders/ci-userlib/tree/v1.0">v1.0</a>: First complete public release (library+documentation).<br />
+          <a href="https://github.com/mynameiszanders/ci-userlib/zipball/v1.0" title="Download Zipball">Download as a ZIP file</a> or, after cloning, checkout the tag:<br />
+          <code class="brush: bash;">
+            git checkout v0.1
+          </code>
+        </li>
+      </ul>
+
+
+      <h2>Installation</h2>
+      <p>
+        To install this library, just copy the file <dfn>Userlib.php</dfn> to the libraries
+        sub-directory within your application folder. By default, CodeIgniter sets
+        this to "<dfn>system/application/libraries/</dfn>".<br />
+        Please refer to the CodeIgniter user guide on <a href="http://codeigniter.com/user_guide/general/creating_libraries.html" title="Creating your own classes for CodeIgniter">creating your own classes</a>
+        for more information.
+      </p>
+
+
+      <h2>Including as a Submodule</h2>
+      <p>
+        You may include the User Authentication library as a submodule to your Git versioned
+        CodeIgniter project. This is useful is you wish to use the User Authentication library,
+        without including it in your versioned project files.<br />
+        The following commands assume that your current working directory is your
+        CodeIgniter installation, with the typical directory structure. You may
+        need to ammend the directory paths as appropriate.
+      </p>
+      <code class="brush: bash;">
+        $ git submodule add http://github.com/mynameiszanders/ci-userlib.git system/application/libraries/userlib<br />
+        $ cd system/application/libraries/userlib<br />
+        $ git checkout submodule
+      </code>
+      <p>
+        These commands create the submodule in your application's libraries folder,
+        and then switch to the branch "submodule". This branch contains only a regularly
+        updated copy of the library itself (from the master branch) - no unnecessary
+        files.
+      </p>
+      <p class="important">
+        <strong>Note:</strong>
+        The directory you choose to place the User Authentication library submodule must not
+        yet exist in your Git index.<br />
+        For more information, please check out the
+        <a href="http://www.kernel.org/pub/software/scm/git/docs/git-submodule.html" title="git-submodule(1) man page">git-submodule man page</a>.
+      </p>
+
+
+      <h2>Initializing the Class</h2>
+      <p>
+        Like most other classes in CodeIgniter, the User Authentication library is initialized
+        in your controller using the <dfn>$this->load->library()</dfn> function:
+      </p>
+      <code class="brush: php;">$this->load->library('userlib');</code>
+      <p>
+        Once loaded, the User Authentication library object will be available using: <dfn>$this->userlib</dfn>
+      </p>
+
+
+
+      <h1 id="requirements">Requirements</h1>
+      <p>
+        The User Authentication library needs a working database connection, and a
+        table with a mimimum requirement of columns for the user ID, name and password hash.
+      </p>
+      <p class="important">
+        <strong>Note:</strong>
+        The User Authentication library MUST be loaded before any output is sent to the
+        browser, otherwise headers cannot be sent, and therefore cookies cannot be set.
+      </p>
+      <h3>Column Requirements</h3>
+      <p>
+        Your table columns must be able to contain certain data types for the
+        user authentication information to be stored in the database. Please note
+        that the column names referenced here are <em>column references</em>, and
+        do not necessarily represent what the columns will be called in your database.
+      </p>
+      <table>
+        <thead>
+        <tr>
+          <td>Column Name / Reference</td>
+          <td>Description of Data Type</td>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td>This is a unique ID of the user. It must be a positive integer.</td>
+          </tr>
+          <tr>
+            <td>username</td>
+            <td>
+              This is the username used to login with. This column must be able to store
+              a string containing between 1 and 64 alphanumeric characters only.
+            </td>
+          </tr>
+          <tr>
+            <td>password</td>
+            <td>
+              This is the hashed version of the user's password. The column is required
+              to store exactly 40 aplhanumeric characters. Please note that passwords
+              are NEVER stored in plain text, or a way that can be unencrypted.
+            </td>
+          </tr>
+          <tr>
+            <td>hashnonce</td>
+            <td>This column is required to store exactly 40 alphanumeric characters.</td>
+          </tr>
+          <tr>
+            <td>cookienonce</td>
+            <td>This column is required to store exactly 40 alphanumeric characters.</td>
+          </tr>
+          <tr>
+            <td>admin</td>
+            <td>
+              This column can contain any data type that can be evaluated to a boolean value,
+              though I suggest you use BIT(1) as it requires the least disk space.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+
+      <h1 id="settings">Settings</h1>
+      <p>
+        Settings can be provided in a config file (usually located at "<dfn>application/config/</dfn>")
+        or through the <dfn>$this->userlib->settings()</dfn> method. Using the method overrides
+        the settings provided in the config file.
+      </p>
+      <h2>Required Settings</h2>
+      <h3>table</h3>
+      <p>
+        The name of the table that will be used to store the necessary information.
+        This table must be in the database specified in your database configuration file.
+      </p>
+      <h3>id</h3>
+      <p>
+        The name of the column that stores the user ID. Must be of type INT.
+      </p>
+      <h3>username</h3>
+      <p>
+        The name of the column that stores the login username. Must be of character
+        type with a minimum length of 64.
+      </p>
+      <h3>password</h3>
+      <p>
+        The name of the column that stores the user's hashes password. Must be of
+        character type with a mimimum length of 40.
+      </p>
+      <h2>Optional Settings</h2>
+      <h3>realm</h3>
+      <p>
+        This can be any string, as all non-alphanumeric characters are removed. If
+        no alphanumeric characters are present, or this isn't set, this defaults to
+        "CodeIgniterUserLib".
+      </p>
+      <p class="important">
+        <strong>Hint:</strong>
+        Change this value to invalidate all cookies set for all users, forcing them
+        to re-authenticate.
+      </p>
+      <h3>hashnonce</h3>
+      <p>
+        The name of the column that stores the user's hash nonce. Must be of character
+        type with a mimimum length of 40.<br />
+        If this is not set, it defaults to an empty string and is not used. The password
+        is still hashed, but will not be as secure.
+      </p>
+      <h3>cookienonce</h3>
+      <p>
+        The name of the column that stores the user's cookie nonce. Must be of character
+        type with a mimimum length of 40.<br />
+        If this is not set, it defaults to an empty string and is not used. The cookie
+        will still work, but the hashing will not be individual to each user, and cannot
+        be re-generated automatically.
+      </p>
+      <h3>admin</h3>
+      <p>
+        The name of the column that stores whether the user is an admin or not. Can be
+        of any data type that can be evaluated to a boolean value.<br />
+        This is only useful if you have a very simple admin system in place, it does
+        not account for permissions, roles, etc.
+      </p>
+      <h2>Example Configuration</h2>
+      <code class="brush: php;">
+        $config = array(<br />
+          'table'       =&#62; 'users_table',<br />
+          'id'          =&#62; 'id',<br />
+          'username'    =&#62; 'name',<br />
+          'password'    =&#62; 'userhash',<br />
+          'realm'       =&#62; 'SuperDuperCool',<br />
+          'hashnonce'   =&#62; 'nonce',<br />
+          'cookienonce' =&#62; 'cookie',<br />
+          'admin'       =&#62; 'superuser',<br />
+        );
+      </code>
+
+
+
+      <h1 id="reference">Method Reference</h1>
+
+
+      <h2>$this-&#62;userlib-&#62;settings(<samp>$user_config</samp>)</h2>
+      <dl>
+        <dt>Parameters</dt>
+        <dd>
+          <dl>
+            <dt>$user_config</dt>
+            <dd>array(string =&#62; string, ...)</dd>
+          </dl>
+        </dd>
+        <dt>Returns</dt>
+        <dd>void</dd>
+      </dl>
+      <p>
+        Override any settings that have been set in the configuration file. The
+        array can contain as many or as little configuation options as you want.
+      </p>
+      <code class="brush: php;">
+        $options = array(
+        &#160;&#160;&#160;&#160;'password' =&#62; 'user_hash',
+        &#160;&#160;&#160;&#160;'realm' =&#62; 'My Realm',
+        );
+        $this-&#62;userlib-&#62;settings($options);
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;login(<var>'username'</var>, <var>'password'</var>)</h2>
+      <dl>
+        <dt>Parameters</dt>
+        <dd>
+          <dl>
+            <dt>$username</dt>
+            <dd>string</dd>
+            <dt>$password</dt>
+            <dd>string</dd>
+          </dl>
+        </dd>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
+      <p>
+        This method takes two strings, the user's username and password, and validates
+        them against the values stored in the database. If the user's credentials
+        are correct, it will return a boolean value depending on whether the correct
+        headers to set the cookie were successfully sent. If the user's credentials
+        were incorrect, it will return a boolean false.
+      </p>
+      <code class="brush: php;">
+        if($this-&#62;userlib-&#62;login($_POST['username'], $_POST['password'])) {
+        &#160;&#160;&#160;&#160;echo 'You are logged in!';
+        }
+        else {
+        &#160;&#160;&#160;&#160;// Display the login form again.
+        }
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;logout()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
+      <p>
+        Logs out the currently logged in user by unsetting the cookie. This method
+        returns a boolean value depending on whether the cookie was successfully
+        removed or not.
+      </p>
+      <p class="important">
+        <strong>Note:</strong>
+        This method technically does not return a value of whether the cookie was
+        removed or not, instead it returns its value depending on whether the correct
+        headers were successfully sent to the client.
+      </p>
+      <code class="brush: php;">
+        // Just call the method, and the cookie will be unset.
+        $logged_out = $this-&#62;userlib-&#62;logout();
+        if(!$logged_out) {
+        &#160;&#160;&#160;&#160;echo 'There was a problem logging you out, please try again.';
+        }
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;create(<var>'username'</var>, <var>'password'</var>, [<kbd>boolean</kbd>])</h2>
+      <dl>
+        <dt>Parameters</dt>
+        <dd>
+          <dl>
+            <dt>$username</dt>
+            <dd>string</dd>
+            <dt>$password</dt>
+            <dd>string</dd>
+            <dt>$admin</dt>
+            <dd>boolean</dd>
+          </dl>
+        </dd>
+        <dt>Returns</dt>
+        <dd>array(string =&#62; string, ...)</dd>
+      </dl>
+      <p>
+        Creates the necessary details ready to be stored in the database from the
+        specified username and password given. An optional third parameter may be
+        passed to specify whether the new user is an administrator, but this defaults
+        to false.<br />
+        This method will return a boolean false if any of the parameters were incorrect.
+      </p>
+      <code class="brush: php;">
+        $new_user = $this-&#62;userlib-&#62;create($_POST['username'], $_POST['password'], $admin);
+        if(is_array($new_user)) {
+        &#160;&#160;&#160;&#160;// Insert the new user's data into the database.
+        &#160;&#160;&#160;&#160;$this-&#62;db-&#62;insert('yourTable', $new_user);
+        }
+        else {
+        &#160;&#160;&#160;&#160;// Display login form again, incorrect parameters passed.
+        }
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;logged_in()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
+      <p>
+        Returns a boolean value depending on whether a user is currently logged in or not.
+      </p>
+      <code class="brush: php;">
+        if($this-&#62;userlib-&#62;logged_in()) {
+        &#160;&#160;&#160;&#160;echo 'Welcome back, ' . $this-&#62;userlib-&#62;username() . '!';
+        }
+        else {
+        &#160;&#160;&#160;&#160;// Redirect to login form?
+        }
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;admin()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>boolean</dd>
+      </dl>
+      <p>
+        Returns a boolean value depending on whether the currently logged in user is
+        an administrator. If there is no user logged in, or the admin table column is
+        not defined, it will return false.
+      </p>
+      <code class="brush: php;">
+        if(!$this-&#62;userlib-&#62;admin()) {
+        &#160;&#160;&#160;&#160;exit('You are not an administrator and therefore not allowed to view this page, you naughty, naughty person!');
+        }
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;username()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>false|string</dd>
+      </dl>
+      <p>
+        Returns a string containing the username of the currently logged in user. If there
+        is no user logged in, it will return a boolean false.
+      </p>
+      <code class="brush: php;">
+        echo 'Welcome back, ' . $this-&#62;userlib-&#62;username() . '!';
+      </code>
+
+
+      <h2>$this-&#62;userlib-&#62;userid()</h2>
+      <dl>
+        <dt>Returns</dt>
+        <dd>false|string</dd>
+      </dl>
+      <p>
+        Returns the currently logged in user's ID as an integer. If there is no user logged
+        in, it will return a boolean false.
+      </p>
+      <code class="brush: php;">
+        echo 'Welcome back, ' . anchor('profile/' . $this-&#62;userlib-&#62;userid(), $this-&#62;userlib-&#62;username()) . '!';
+      </code>
+
+
+
+      <h1 id="accreditations">Accreditations</h1>
+      <p>
+        User Authentication library, by <a href="http://github.com/mynameiszanders" title="GitHub Profile">Alexander Baldwin</a>;
+        written for the <a href="http://codeigniter.com" title="CodeIgniter Homepage">CodeIgniter</a> PHP Application
+        Framework, by <a href="http://ellislab.com" title="EllisLab, Inc.">EllisLab</a>.
+      </p>
+      <p>
+        Please view the CodeIgniter <a href="http://codeigniter.com/user_guide/license.html" title="CodeIgniter's License Agreement">license agreement</a>
+        before using the framework, or this library.
+      </p>
+
+    </div>
+    <script type="text/javascript" src="./js/shCore.js"></script>
+    <script type="text/javascript" src="./js/shBrushes.js"></script>
+    <script type="text/javascript">
+      (function(a){var e=["./css/shCore.css"],c=a.getElementsByTagName("head")[0];for(var b=0;b<e.length;b++){var d=a.createElement("link");d.href=e[b];d.rel="stylesheet";c.appendChild(d)}})(document);
+      SyntaxHighlighter.config.tagName = "code";
+      SyntaxHighlighter.config.stripBrs = true;
+      SyntaxHighlighter.all();
+    </script>
+  </body>
+</html>
