@@ -1,4 +1,4 @@
-Matt's Homework Project
+Matt's Homework Project ![Project Status](http://stillmaintained.com/mynameiszanders/ci-userlib.png "Project Status")
 =======================
 
 Is now a CodeIgniter application. See that for examples.
