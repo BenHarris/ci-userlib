@@ -253,7 +253,7 @@
 			if(!is_string($nonce) || strlen($nonce) !== 40 || !is_string($this->user->cookienonce) || strlen($this->user->cookienonce) !== 40) {
 				return false;
 			}
-			$dbq = "UPDATE `{$this->settings['table']}` SET `cookienonce` = '{$nonce}' WHERE `id` = {$this->id} LIMIT 1;";
+			$dbq = "UPDATE `{$this->settings['table']}` SET `{$this->settings['cookienonce']}` = '{$nonce}' WHERE `id` = {$this->id} LIMIT 1;";
 			$this->CI->db->query($dbq);
 			return true;
 		}
