@@ -25,6 +25,7 @@
 						'hashnonce' => false,
 						'cookienonce' => false,
 						'admin' => false,
+						'regen' => false,
 					),
 					$user = null,
 					$id = null,
@@ -78,6 +79,11 @@
 			}
 			else {
 				$this->id = false;
+			}
+			// If the user validates, and the "regen" setting is set, regenerate the
+			// cookie nonce, and send back the new cookie.
+			if(is_int($this->id) && $this->settings['regen']) {
+				$this->regenerate();
 			}
 		}
 
@@ -211,6 +217,48 @@
 		}
 
 		/**
+		 * Regenerate Cookie Nonce
+		 * Regenerate the cookie with a new random cookie nonce. This means the
+		 * cookie is only valid for one page view before it gets recalculated.
+		 * This way a cookie is most likely already invalid by the time an
+		 * attacker gets hold of it.
+		 *
+		 * @access private
+		 * @return boolean
+		 */
+		private function regenerate() {
+			$newnonce = sha1(microtime());
+			$cookie = $this->user->id . '-' . sha1($this->user->name . ':' . $this->user->hash . ':' . $newnonce);
+			// If we are able to set the correct headers to alter the cookie,
+			// save the new nonce.
+			if($this->cookie($cookie)) {
+				$this->user->cookienonce = $newnonce;
+				$this->update_cnonce($newnonce);
+				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * Update Database Cookie Nonce
+		 *
+		 * Update the cookie nonce value in the database.
+		 *
+		 * @access private
+		 * @return boolean
+		 */
+		private function update_cnonce($nonce) {
+			// If the provided, or original, cookie nonce is not a 40-byte
+			// string, don't bother trying to update.
+			if(!is_string($nonce) || strlen($nonce) !== 40 || !is_string($this->user->cookienonce) || strlen($this->user->cookienonce) !== 40) {
+				return false;
+			}
+			$dbq = "UPDATE `{$this->settings['table']}` SET `cookienonce` = '{$nonce}' WHERE `id` = {$this->id} LIMIT 1;";
+			$this->CI->db->query($dbq);
+			return true;
+		}
+
+		/**
 		 * Set Cookie
 		 * Passing a string as the first parameter will set that cookie for two weeks.
 		 * If you don't pass a first parameter, it will unset the cookie and the user.
@@ -278,6 +326,9 @@
 		 */
 		public function logout() {
 			$this->id = false;
+			if(is_string($this->user->cookienonce) && strlen($this->user->cookienonce) === 40) {
+				$this->update_cnonce(sha1(microtime()));
+			}
 			return $this->cookie();
 		}
 
