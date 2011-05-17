@@ -277,6 +277,13 @@
         This is only useful if you have a very simple admin system in place, it does
         not account for permissions, roles, etc.
       </p>
+	  <h3>regen</h3>
+	  <p>
+		A boolean value stating whether you would like the cookie nonce regenerated
+		on each page load. This reduces the change of an attacker being able to use
+		a cookie that has been intercepted, but adds an additional 102 bytes, plus
+		however long your realm name is, onto each request.
+	  </p>
       <h2>Example Configuration</h2>
       <code class="brush: php;">
         $config = array(<br />
