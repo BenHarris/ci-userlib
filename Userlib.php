@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CodeIgniter Simple User Authentication
+ * Simple User Authentication
  *
  * @author    Alexander Baldwin <http://github.com/mynameiszanders>
  * @link      http://github.com/mynameiszanders/matts_homework_project
