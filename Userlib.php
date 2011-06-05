@@ -8,15 +8,10 @@
  * @license   MIT/X11 <http://j.mp/mit-license>
  */
 
-  if(!defined('BASEPATH')) {
-    headers_sent() || header('HTTP/1.1 404 Not Found', true, 404);
-    exit('No direct script access allowed.');
-  }
-
   class Userlib {
 
-    protected $realm,
-              $settings = array(
+    protected $realm;
+    protected $settings = array(
                 'realm' => '',
                 'table' => 'users',
                 'id' => 'id',
@@ -25,10 +20,9 @@
                 'hashnonce' => false,
                 'cookienonce' => false,
                 'admin' => false,
-              ),
-              $user = null,
-              $id = null,
-              $CI;
+              );
+    protected $user = null;
+    protected $id = null;
 
     /**
      * Constructor Method
@@ -37,14 +31,6 @@
      * @return void
      */
     public function __construct($user_config = false) {
-      $this->CI =& get_instance();
-      $this->CI->load->database();
-      // Load any config settings that the user has saved in a file, and
-      // incorporate them into the library settings.
-      if(!is_array($user_config) || !$user_config) {
-        $this->CI->config->load('userlib', true, true);
-        $user_config = $this->CI->config->item('userlib');
-      }
       if(is_array($user_config) && $user_config) {
         foreach($user_config as $key => $value) {
           if(array_key_exists($key, $this->settings)) {
@@ -52,12 +38,14 @@
           }
         }
       }
+
       // Remove any non-alphanumeric characters from the realm. If that results
       // in an empty string, set a default realm.
       $this->realm = is_string($this->settings['realm'])
                   && ($realm = preg_replace('/[^a-zA-Z0-9]/', '', $this->settings['realm'])) != ''
                    ? $realm
                    : 'CodeIgniterUserLib';
+
       // Check that the table name and the id, username and password column names
       // are valid. These are the minimum requirements.
       $checks = array(
@@ -66,17 +54,18 @@
         $this->settings['username'],
         $this->settings['password']
       );
+
       foreach($checks as $check) {
         if(!is_string($check) || strlen($check) > 64 || strlen($check) < 1) {
           $this->id = false;
           return false;
         }
       }
+
       // If the realm cookie exists, validate it!
       if(isset($_COOKIE[$this->realm])) {
         $this->id = $this->validate();
-      }
-      else {
+      } else {
         $this->id = false;
       }
     }
@@ -109,6 +98,7 @@
         return false;
       }
       $from = is_int($unique) ? $this->settings['id'] : $this->settings['username'];
+
       // Generate the SQL Query for grabbing the required data from the database.
       $dbq = "SELECT `{$this->settings['id']}` AS `id`, `{$this->settings['username']}` AS `name`, `{$this->settings['password']}` AS `hash`";
       if(is_string($this->settings['hashnonce'])) {
@@ -121,12 +111,14 @@
         $dbq .= ", `{$this->settings['admin']}` AS `admin`";
       }
       $dbq .= " FROM `{$this->settings['table']}` WHERE `{$from}` = '{$unique}' LIMIT 1;";
+
       // Query the database and make sure we have a usable result.
       $result = $this->CI->db->query($dbq);
       if($result->num_rows() != 1) {
         return false;
       }
       $this->user = $result->row();
+
       // If the optional column are not present, fill them with default data.
       if(!isset($this->user->cookienonce)) {
         $this->user->cookienonce = '';
@@ -182,6 +174,7 @@
       // password hash, you're pretty much screwed anyway...
       $oddbit = preg_replace('/[^ace13579]/', '', $nonce);
       $oddbit = strlen($oddbit) % 2 ? 13 : 17;
+
       // State which hashing algorithm to use, after determining which algorithms
       // we want exist on this installation of PHP.
       $algos = hash_algos();
@@ -229,6 +222,7 @@
           $timeout = time() + 1209600;
         }
         $value = (string) $value;
+
         // Top tip! If you are using a local domain (like "localhost" or
         // "devserver"), the host must be an empty string rather than the domain.
         // Tooks me HOURS to figure that out :@
@@ -256,11 +250,13 @@
       if(!is_string($username) || !is_string($password) || !preg_match('/^[a-zA-Z0-9]{1,64}$/', ($username = strtolower($username))) || !$this->fetch($username) || $this->logged_in()) {
         return false;
       }
+
       // Generate the password hash and check against the value returned from the database.
       $password = $this->hash($password, $this->user->hashnonce);
       if($password != $this->user->hash) {
         return false;
       }
+
       // If the user supplied the correct password, set a cookie so that we can
       // validate the user accross different HTTP requests.
       $cookie = $this->user->id . '-' . sha1($this->user->name . ':' . $this->user->hash . ':' . $this->user->cookienonce);
